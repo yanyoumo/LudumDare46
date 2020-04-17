@@ -15,6 +15,24 @@ namespace theArchitectTechPack
                 textureImporter.textureShape = TextureImporterShape.TextureCube;
                 textureImporter.sRGBTexture = true;
             }
+            if (assetPath.ToLower().Contains("_basecolor.tga"))
+            {
+                textureImporter.textureShape = TextureImporterShape.Texture2D;
+                textureImporter.sRGBTexture = true;
+                textureImporter.textureType = TextureImporterType.Default;
+            }
+            if (assetPath.ToLower().Contains("_maskmap.tga"))
+            {
+                textureImporter.textureShape = TextureImporterShape.Texture2D;
+                textureImporter.sRGBTexture = false;
+                textureImporter.textureType = TextureImporterType.Default;
+            }
+            if (assetPath.ToLower().Contains("_normal.tga"))
+            {
+                textureImporter.textureShape = TextureImporterShape.Texture2D;
+                textureImporter.sRGBTexture = false;
+                textureImporter.textureType = TextureImporterType.NormalMap;
+            }
         }
 
         void OnPreprocessModel()
