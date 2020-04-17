@@ -15,7 +15,6 @@ namespace theArchitectTechPack
                 textureImporter.textureShape = TextureImporterShape.TextureCube;
                 textureImporter.sRGBTexture = true;
             }
-
             if (assetPath.ToLower().Contains("_basecolor.tga"))
             {
                 textureImporter.textureShape = TextureImporterShape.Texture2D;
