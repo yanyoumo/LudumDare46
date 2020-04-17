@@ -23,7 +23,7 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 1
+  m_AmbientIntensity: 0.21
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1443680570}
-  m_IndirectSpecularColor: {r: 0.18028516, g: 0.22571537, b: 0.30692393, a: 1}
+  m_IndirectSpecularColor: {r: 0.46169674, g: 0.51241773, b: 0.589934, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -458,5 +458,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoundedCube
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6346655106240990956, guid: 81d52d6f479b1284bbd676d173f537ca, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 81d52d6f479b1284bbd676d173f537ca, type: 3}
