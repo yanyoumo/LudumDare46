@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1443680570}
-  m_IndirectSpecularColor: {r: 0.55290264, g: 0.5706104, b: 0.5467159, a: 1}
+  m_IndirectSpecularColor: {r: 0.31474316, g: 0.35070384, b: 0.37986997, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -64,15 +64,16 @@ LightmapSettings:
     m_CompAOExponentDirect: 0
     m_ExtractAmbientOcclusion: 0
     m_Padding: 2
-    m_LightmapParameters: {fileID: 0}
+    m_LightmapParameters: {fileID: 15200, guid: 0000000000000000f000000000000000,
+      type: 0}
     m_LightmapsBakeMode: 1
-    m_TextureCompression: 1
+    m_TextureCompression: 0
     m_FinalGather: 0
     m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
-    m_BakeBackend: 2
+    m_BakeBackend: 1
     m_PVRSampling: 1
     m_PVRDirectSampleCount: 32
     m_PVRSampleCount: 512
@@ -211,7 +212,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Profile: {fileID: 11400000, guid: 9ded8b8006cd8254886095f0995ab7a7, type: 2}
   m_StaticLightingSkyUniqueID: 1
-  m_SkySettings: {fileID: 1781944596}
+  m_SkySettings: {fileID: 1866625138}
   m_SkySettingsFromProfile: {fileID: -1356381860374623851, guid: 9ded8b8006cd8254886095f0995ab7a7,
     type: 2}
 --- !u!4 &852123483
@@ -314,13 +315,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1443680569}
-  m_LocalRotation: {x: 0.2910309, y: -0.76558477, z: 0.3928952, w: 0.41810808}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: 0.106076345, y: -0.937707, z: 0.043696247, w: 0.32793903}
+  m_LocalPosition: {x: 0.463, y: 3, z: 1.905}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 57.667004, y: -129.7, z: -12.644001}
+  m_LocalEulerAnglesHint: {x: 8.715, y: -142.20601, z: -9.92}
 --- !u!114 &1443680572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -792,7 +793,7 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1781944596
+--- !u!114 &1866625138
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -843,7 +844,7 @@ MonoBehaviour:
     m_Value: 0
   hdriSky:
     m_OverrideState: 0
-    m_Value: {fileID: 8900000, guid: 3c83ec2dd7797cc4faae20995b0a2e78, type: 3}
+    m_Value: {fileID: 8900000, guid: 96ca5d470aef6c742b543c0682d31182, type: 3}
   enableBackplate:
     m_OverrideState: 0
     m_Value: 0
@@ -900,10 +901,40 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 509071436893712924, guid: 75016f2e113e16a4fa2a12569fb73c8c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1074619017738448521, guid: 75016f2e113e16a4fa2a12569fb73c8c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 4262439731802281599, guid: 75016f2e113e16a4fa2a12569fb73c8c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 5995028379588224103, guid: 75016f2e113e16a4fa2a12569fb73c8c,
         type: 3}
       propertyPath: m_Name
       value: ShaderBall
+      objectReference: {fileID: 0}
+    - target: {fileID: 5995028379588224103, guid: 75016f2e113e16a4fa2a12569fb73c8c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 6928774039780162321, guid: 75016f2e113e16a4fa2a12569fb73c8c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 7222632476641194904, guid: 75016f2e113e16a4fa2a12569fb73c8c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 7307591037066352244, guid: 75016f2e113e16a4fa2a12569fb73c8c,
         type: 3}
@@ -959,6 +990,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9068001669668463740, guid: 75016f2e113e16a4fa2a12569fb73c8c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 75016f2e113e16a4fa2a12569fb73c8c, type: 3}
