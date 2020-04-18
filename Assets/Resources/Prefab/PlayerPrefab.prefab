@@ -193,7 +193,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7162772704565205617}
-  - component: {fileID: 7336782953451699296}
   - component: {fileID: 1752984394}
   m_Layer: 0
   m_Name: PlayerPrefab
@@ -221,22 +220,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7336782953451699296
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5441573445138196604}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42fba0a4c5f7d3042828926e9c2e9ca4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Campos: {fileID: 1613675136}
-  speed: 0.75
-  delVal: 0.1
-  charCtrl: {fileID: 1752984394}
 --- !u!143 &1752984394
 CharacterController:
   m_ObjectHideFlags: 0
