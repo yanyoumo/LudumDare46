@@ -2,17 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PickUpScript : MonoBehaviour
+namespace theArch_LD46
 {
-    // Start is called before the first frame update
-    void Start()
+    public class PickUpScript : MonoBehaviour
     {
-        
-    }
+        public SenseType senseType { private set; get; }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public float val { private set; get; }
+
+        public Mesh senseVisionMesh;
+        public Mesh senseAudioMesh;
+        public Mesh senseFeelingMesh;
+        public Mesh senseMeshCompass;
+
+        public void InitPickUp()
+        {
+
+        }
+
+        // Start is called before the first frame update
+        void Start()
+        {
+
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+
+        }
     }
 }
