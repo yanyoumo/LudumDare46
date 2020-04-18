@@ -7,7 +7,6 @@ namespace theArchitectTechPack
     {
         void OnPreprocessTexture()
         {
-            //TODO 线性空间和法线控制那些东西。但是估计LD46用不上。
             TextureImporter textureImporter = assetImporter as TextureImporter;
             System.Diagnostics.Debug.Assert(textureImporter != null, nameof(textureImporter) + " != null");
             if (assetPath.ToLower().Contains(".hdr"))
