@@ -73,7 +73,14 @@ public class PlayerScript : MonoBehaviour
         }
         else
         {
-            velocity = new Vector3(0,0,0);
+            if (velocity.magnitude > 0.001f)
+            {
+                velocity = velocity * 0.5f;
+            }
+            else
+            {
+                velocity =new Vector3(0,0,0);
+            }
         }
         /*
         if (speed > -max_speed && speed <= -0.001 * max_speed)
