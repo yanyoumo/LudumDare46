@@ -54,7 +54,14 @@ namespace theArch_LD46
                 }
                 else
                 {
-                    res[i]=Color.white;
+                    if (barCount > 4)
+                    {
+                        res[i] = Color.green;
+                    }
+                    else
+                    {
+                        res[i] = Color.red;
+                    }
                 }
             }
             return res;
@@ -168,6 +175,21 @@ namespace theArch_LD46
                         PickUpInds[i].gameObject.SetActive(false);
                     }
                 }
+            }
+
+            if (player.IsMoving)
+            {
+                visionBar.SetBarFrameColor(Color.red);
+                hearingBar.SetBarFrameColor(Color.red);
+                feelingBar.SetBarFrameColor(Color.red);
+                compassBar.SetBarFrameColor(Color.red);
+            }
+            else
+            {
+                visionBar.SetBarFrameColor(Color.white);
+                hearingBar.SetBarFrameColor(Color.white);
+                feelingBar.SetBarFrameColor(Color.white);
+                compassBar.SetBarFrameColor(Color.white);
             }
 
             float visionRag = Mathf.Lerp(1.3f, 4.0f, VisionStrength);

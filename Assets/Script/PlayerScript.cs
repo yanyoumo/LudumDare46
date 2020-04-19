@@ -20,20 +20,24 @@ namespace theArch_LD46
         public float CompassVal { private set; get; }
 
         public float speed = 0.75f;
-        public float delVal = 0.05f;
+        public float delVal = 0.1f;
+
+        public bool IsMoving = false;
 
         public CharacterController charCtrl;
+
+        public Transform meshRoot;
 
         // Start is called before the first frame update
         void Start()
         {
-            MoveForward = -Vector3.Normalize(new Vector3(Campos.position.x, 0.0f, Campos.position.z));
+            MoveForward = Vector3.Normalize(new Vector3(Camera.main.transform.forward.x, 0.0f, Camera.main.transform.forward.z));
             MoveLeft = Vector3.Cross(MoveForward, Vector3.up);
 
-            VisionVal = 1.0f;
-            AudioVal = 1.0f;
-            FeelingVal = 1.0f;
-            CompassVal = 1.0f;
+            VisionVal = 0.75f;
+            AudioVal = 0.0f;
+            FeelingVal = 0.0f;
+            CompassVal = 0.0f;
         }
 
         // Update is called once per frame
@@ -45,15 +49,23 @@ namespace theArch_LD46
 
             charCtrl.Move(movingVec);
 
-            VisionVal -= delVal * theArch_LD46_Time.delTime;
-            AudioVal -= delVal * theArch_LD46_Time.delTime;
-            FeelingVal -= delVal * theArch_LD46_Time.delTime;
-            CompassVal -= delVal * theArch_LD46_Time.delTime;
+            IsMoving = Input.anyKey;
 
-            VisionVal = Mathf.Clamp01(VisionVal);
-            AudioVal = Mathf.Clamp01(AudioVal);
-            FeelingVal = Mathf.Clamp01(FeelingVal);
-            CompassVal = Mathf.Clamp01(CompassVal);
+            if (IsMoving)
+            {
+                VisionVal -= delVal * theArch_LD46_Time.delTime;
+                AudioVal -= delVal * theArch_LD46_Time.delTime;
+                FeelingVal -= delVal * theArch_LD46_Time.delTime;
+                CompassVal -= delVal * theArch_LD46_Time.delTime;
+
+                VisionVal = Mathf.Clamp01(VisionVal);
+                AudioVal = Mathf.Clamp01(AudioVal);
+                FeelingVal = Mathf.Clamp01(FeelingVal);
+                CompassVal = Mathf.Clamp01(CompassVal);
+
+                meshRoot.transform.Rotate(Quaternion.Euler(10.0f, 0.0f, 0.0f).eulerAngles);
+                //meshRoot.rotation= meshRoot.rotation.SetFromToRotation(Quaternion.Euler(0.0f, 0.1f, 0.0f));
+            }
         }
 
         private void OnTriggerEnter(Collider other)

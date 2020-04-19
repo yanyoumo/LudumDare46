@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = System.Random;
 
 namespace theArch_LD46
 {
@@ -16,16 +17,26 @@ namespace theArch_LD46
         public Texture2D senseFeelingTexture;
         public Texture2D senseCompassTexture;
         
-        public Mesh senseVisionMesh;
+        /*public Mesh senseVisionMesh;
         public Mesh senseAudioMesh;
         public Mesh senseFeelingMesh;
-        public Mesh senseCompassMesh;
+        public Mesh senseCompassMesh;*/
 
         public bool pendingDead = false;
 
         public Transform labelTrans;
 
         public GameMgr gameMgr;
+
+        public Transform MeshRoot;
+        public Transform MeshRingA;
+        public Transform MeshRingB;
+
+        private Vector3 OrgMeshRootPos;
+
+        private float CorePhase;
+        private Vector3 RingAxisA;
+        private Vector3 RingAxisB;
 
         public void InitPickUp()
         {
@@ -50,6 +61,12 @@ namespace theArch_LD46
                     throw new ArgumentOutOfRangeException();
             }
             labelTrans.GetComponentInChildren<MeshRenderer>().material.SetTexture("_UnlitColorMap", targetTex);
+
+            OrgMeshRootPos = MeshRoot.position;
+
+            CorePhase = UnityEngine.Random.value;
+            RingAxisA = UnityEngine.Random.insideUnitSphere;
+            RingAxisB = Vector3.Cross(RingAxisA, Vector3.up).normalized;
         }
 
         // Start is called before the first frame update
@@ -66,6 +83,11 @@ namespace theArch_LD46
                 gameMgr.PickUps.Remove(this);
                 Destroy(gameObject);
             }
+
+            MeshRoot.position = OrgMeshRootPos +
+                                new Vector3(0.0f, 0.2f, 0.0f) * Mathf.Sin(theArch_LD46_Time.Time * 7.5f + CorePhase);
+            MeshRingA.transform.Rotate(RingAxisA, 8f);
+            MeshRingB.transform.Rotate(RingAxisB, 8f);
         }
     }
 }
