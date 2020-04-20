@@ -14,6 +14,8 @@ namespace theArch_LD46
 
         public CharacterController charCtrl;
 
+        public Transform meshRoot;
+
         public void SetPosition(Vector3 pos)
         {
             gameObject.transform.position = pos;
@@ -31,11 +33,22 @@ namespace theArch_LD46
             Vector3 forward;
             forward = XAxisPatrolOrZ ? new Vector3(1.0f,0.0f,0.0f) : new Vector3(0.0f, 0.0f, 1.0f);
             charCtrl.Move(forward * (GoForward ? 1.0f : -1.0f) * speed);
+
+            meshRoot.transform.Rotate(0, GoForward ? 1.5f : -1.5f, 0);
         }
 
-        void OnControllerColliderHit()
+        void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            GoForward = !GoForward;
+            if (!hit.collider.gameObject.GetComponent<PlayerScript>())
+            {
+                if (!hit.collider.gameObject.GetComponent<PickUpScript>())
+                {
+                    if (!hit.collider.gameObject.GetComponent<Enemy>())
+                    {
+                        GoForward = !GoForward;
+                    }
+                }
+            }          
         }
     }
 }

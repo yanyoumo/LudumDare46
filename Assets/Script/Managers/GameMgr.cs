@@ -13,6 +13,9 @@ namespace theArch_LD46
         public List<Enemy> Enemies { private set; get; }
         public List<PickUpScript> PickUps { private set; get; }
 
+        public AudioSource MenuBGM;
+        public AudioSource PlayingBGM;
+
         private float GroundStretch = 10.0f;
 
         private Vector3 GetRandomGroundPos()
@@ -28,6 +31,9 @@ namespace theArch_LD46
 
             Enemies = new List<Enemy>();
             PickUps = new List<PickUpScript>();
+
+            PlayingBGM.Play();
+            //AudioSource.PlayClipAtPoint(audioClip, Vector3.zero);
         }
 
         // Start is called before the first frame update
