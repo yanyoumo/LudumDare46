@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using theArch_LD46.GlobalHelper;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.VFX;
 
 namespace theArch_LD46
 {
@@ -39,6 +40,8 @@ namespace theArch_LD46
 
         public AudioSource pickUpSFX;
 
+        public VisualEffect vf;
+
         public void Toplay()
         {
             BlurPlane.gameObject.SetActive(false);
@@ -71,7 +74,9 @@ namespace theArch_LD46
         {
             if (Playing)
             {
-                if(hintCounter<= hintMax)
+                vf.SetVector3("PlayerPos", this.transform.position+new Vector3(0.0f, 0.5f, 0.0f));
+
+                if (hintCounter <= hintMax)
                 {
                     hintCounter += theArch_LD46_Time.delTime;
                 }
@@ -80,12 +85,14 @@ namespace theArch_LD46
                     HintArrowPlane.gameObject.SetActive(false);
                 }
 
-                MoveForward = Vector3.Normalize(new Vector3(Camera.main.transform.forward.x, 0.0f, Camera.main.transform.forward.z));
+                MoveForward = Vector3.Normalize(new Vector3(Camera.main.transform.forward.x, 0.0f,
+                    Camera.main.transform.forward.z));
                 MoveLeft = Vector3.Cross(MoveForward, Vector3.up);
 
                 Vector2 inputVec = new Vector2(Input.GetAxis(GlobalHelper.StaticName.INPUT_AXIS_NAME_FORWARD),
                     Input.GetAxis(GlobalHelper.StaticName.INPUT_AXIS_NAME_LEFT));
-                Vector3 movingVec = (Input.GetAxis(GlobalHelper.StaticName.INPUT_AXIS_NAME_FORWARD) * MoveForward) + (inputVec.y * MoveLeft);
+                Vector3 movingVec = (Input.GetAxis(GlobalHelper.StaticName.INPUT_AXIS_NAME_FORWARD) * MoveForward) +
+                                    (inputVec.y * MoveLeft);
                 movingVec = Vector3.Normalize(movingVec) * speed * theArch_LD46_Time.delTime;
 
                 this.transform.Rotate(0, -Input.GetAxis(GlobalHelper.StaticName.INPUT_AXIS_NAME_LOOK_LEFT), 0);
@@ -93,20 +100,24 @@ namespace theArch_LD46
 
                 IsMoving = Input.anyKey;
 
+                vf.SetFloat("SpawnRate", IsMoving ? 320.0f : 0.0f);
+
+                //vf.enabled = IsMoving;
+
                 /*if (IsMoving)
                 {*/
-                    VisionVal -= delVal * theArch_LD46_Time.delTime;
-                    AudioVal -= delVal * theArch_LD46_Time.delTime;
-                    FeelingVal -= delVal * theArch_LD46_Time.delTime;
-                    CompassVal -= delVal * theArch_LD46_Time.delTime;
+                VisionVal -= delVal * theArch_LD46_Time.delTime;
+                AudioVal -= delVal * theArch_LD46_Time.delTime;
+                FeelingVal -= delVal * theArch_LD46_Time.delTime;
+                CompassVal -= delVal * theArch_LD46_Time.delTime;
 
-                    VisionVal = Mathf.Clamp01(VisionVal);
-                    AudioVal = Mathf.Clamp01(AudioVal);
-                    FeelingVal = Mathf.Clamp01(FeelingVal);
-                    CompassVal = Mathf.Clamp01(CompassVal);
+                VisionVal = Mathf.Clamp01(VisionVal);
+                AudioVal = Mathf.Clamp01(AudioVal);
+                FeelingVal = Mathf.Clamp01(FeelingVal);
+                CompassVal = Mathf.Clamp01(CompassVal);
 
-                    //meshRoot.transform.Rotate(Quaternion.Euler(3.0f, 0.0f, 0.0f).eulerAngles);
-                    //meshRoot.rotation= meshRoot.rotation.SetFromToRotation(Quaternion.Euler(0.0f, 0.1f, 0.0f));
+                //meshRoot.transform.Rotate(Quaternion.Euler(3.0f, 0.0f, 0.0f).eulerAngles);
+                //meshRoot.rotation= meshRoot.rotation.SetFromToRotation(Quaternion.Euler(0.0f, 0.1f, 0.0f));
                 //}
             }
         }
