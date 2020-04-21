@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 namespace theArch_LD46
 {
@@ -15,6 +16,8 @@ namespace theArch_LD46
         public CharacterController charCtrl;
 
         public Transform meshRoot;
+
+        public VisualEffect vf;
 
         public void SetPosition(Vector3 pos)
         {
@@ -35,6 +38,8 @@ namespace theArch_LD46
             charCtrl.Move(forward * (GoForward ? 1.0f : -1.0f) * speed);
 
             meshRoot.transform.Rotate(0, GoForward ? 1.5f : -1.5f, 0);
+
+            vf.SetVector3("EnemyPos",transform.position);
         }
 
         void OnControllerColliderHit(ControllerColliderHit hit)

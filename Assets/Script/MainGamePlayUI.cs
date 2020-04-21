@@ -5,6 +5,7 @@ using System.Linq;
 using Cinemachine;
 using theArch_LD46.GlobalHelper;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace theArch_LD46
@@ -101,12 +102,17 @@ namespace theArch_LD46
             feelingBar.SetBlockFrameColor(new[] { Color.gray });
             compassBar.SetBlockFrameColor(new[] { Color.gray });
 
+            visionBar.SetBarFrameColor(Color.white);
+            hearingBar.SetBarFrameColor(Color.white);
+            feelingBar.SetBarFrameColor(Color.white);
+            compassBar.SetBarFrameColor(Color.white);
+
             GameStartTransform.gameObject.SetActive(false);
         }
 
         private float GetSignedAngle(Vector3 from, Vector3 left ,Vector3 to)
         {
-            return Mathf.Sign(Vector3.Dot(from, left)) * Vector3.Angle(player.MoveForward, to);
+            return Mathf.Sign(Vector3.Dot(to, left)) * Vector3.Angle(from, to);
         }
 
         private Sprite getTexBySenseType(SenseType senseType)
@@ -204,7 +210,7 @@ namespace theArch_LD46
                     }
                 }
 
-                if (player.IsMoving)
+                /*if (player.IsMoving)
                 {
                     visionBar.SetBarFrameColor(Color.red);
                     hearingBar.SetBarFrameColor(Color.red);
@@ -217,7 +223,7 @@ namespace theArch_LD46
                     hearingBar.SetBarFrameColor(Color.white);
                     feelingBar.SetBarFrameColor(Color.white);
                     compassBar.SetBarFrameColor(Color.white);
-                }
+                }*/
 
                 float visionRag = Mathf.Lerp(1.0f, 4.0f, VisionStrength);
 
@@ -241,6 +247,13 @@ namespace theArch_LD46
             {
                 if (Input.GetButtonDown(StaticName.INPUT_BUTTON_NAME_GAME_START))
                 {
+                    //Debug.Log("Enter");
+                    if (player.GameComplete)
+                    {
+                        theArch_LD46.theArch_LD46_Time.firstTimeGame = true;
+                        SceneManager.LoadScene(StaticName.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
+                        return;
+                    }
                     theArch_LD46.theArch_LD46_Time.firstTimeGame = false;
                     InitUIForPlay();
                 }

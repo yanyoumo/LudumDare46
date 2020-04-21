@@ -29,14 +29,14 @@ namespace theArch_LD46
 
         public Transform meshRoot;
 
-        public Transform HintArrowPlane;
+        //public Transform HintArrowPlane;
 
         public Transform BlurPlane;
         public bool Playing=false;
         public bool GameComplete=false;
 
-        private const float hintMax = 5;
-        private float hintCounter = 0;
+        //private const float hintMax = 5;
+        //private float hintCounter = 0;
 
         public AudioSource pickUpSFX;
 
@@ -46,7 +46,7 @@ namespace theArch_LD46
         {
             BlurPlane.gameObject.SetActive(false);
             Playing = true;
-            hintCounter = 0;
+            //hintCounter = 0;
         }
 
         // Start is called before the first frame update
@@ -58,7 +58,7 @@ namespace theArch_LD46
             VisionVal = 0.5f;
             AudioVal = 0.0f;
             FeelingVal = 0.0f;
-            CompassVal = 1.0f;
+            CompassVal = 0.0f;
 
             BlurPlane.gameObject.SetActive(true);
 
@@ -75,15 +75,6 @@ namespace theArch_LD46
             if (Playing)
             {
                 vf.SetVector3("PlayerPos", this.transform.position+new Vector3(0.0f, 0.5f, 0.0f));
-
-                if (hintCounter <= hintMax)
-                {
-                    hintCounter += theArch_LD46_Time.delTime;
-                }
-                else
-                {
-                    HintArrowPlane.gameObject.SetActive(false);
-                }
 
                 MoveForward = Vector3.Normalize(new Vector3(Camera.main.transform.forward.x, 0.0f,
                     Camera.main.transform.forward.z));
@@ -116,9 +107,6 @@ namespace theArch_LD46
                 FeelingVal = Mathf.Clamp01(FeelingVal);
                 CompassVal = Mathf.Clamp01(CompassVal);
 
-                //meshRoot.transform.Rotate(Quaternion.Euler(3.0f, 0.0f, 0.0f).eulerAngles);
-                //meshRoot.rotation= meshRoot.rotation.SetFromToRotation(Quaternion.Euler(0.0f, 0.1f, 0.0f));
-                //}
             }
         }
 
