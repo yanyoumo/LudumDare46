@@ -7,9 +7,14 @@ namespace theArch_LD46
 {
     public class GameMgr : MonoBehaviour
     {
+        public GameObject EnemyRoot;
+        public GameObject PickUpRoot;
         public GameObject EnemyTemplate;
         public List<Enemy> Enemies { private set; get; }
         public List<PickUpScript> PickUps { private set; get; }
+
+        public AudioSource MenuBGM;
+        public AudioSource PlayingBGM;
 
         private float GroundStretch = 10.0f;
 
@@ -26,17 +31,24 @@ namespace theArch_LD46
 
             Enemies = new List<Enemy>();
             PickUps = new List<PickUpScript>();
+
+            PlayingBGM.Play();
+            //AudioSource.PlayClipAtPoint(audioClip, Vector3.zero);
         }
 
         // Start is called before the first frame update
         void Start()
         {
-            for (int i = 0; i < 10; i++)
+            Enemy[] enemies = EnemyRoot.GetComponentsInChildren<Enemy>();
+            foreach (var enemy in enemies)
             {
-                GameObject go = Instantiate(EnemyTemplate);
-                Enemy enemy = go.GetComponent<Enemy>();
-                enemy.SetPosition(GetRandomGroundPos());
                 Enemies.Add(enemy);
+            }
+            PickUpScript[] pickUps = PickUpRoot.GetComponentsInChildren<PickUpScript>();
+            foreach (var pickup in pickUps)
+            {
+                pickup.gameMgr = this;
+                PickUps.Add(pickup);
             }
         }
 
@@ -45,8 +57,6 @@ namespace theArch_LD46
         {
             theArch_LD46.theArch_LD46_Time.Time = Time.timeSinceLevelLoad;
             theArch_LD46.theArch_LD46_Time.delTime = Time.deltaTime;
-
-            //Camera.current.WorldToScreenPoint(Vector3.zero);
         }
 
         void OnDestroy()
