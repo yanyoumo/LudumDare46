@@ -1,7 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace theArchitectTechPack.GlobalHelper
 {
@@ -12,6 +15,11 @@ namespace theArchitectTechPack.GlobalHelper
 
     public static partial class Utils
     {
+        public static IEnumerable<T> GetEnumValuesAsArray<T>()
+        {
+            return Enum.GetValues(typeof(T)).Cast<T>();
+        }
+
         [CanBeNull]
         public static T GenerateWeightedRandom<T>(T[] lib)
         {

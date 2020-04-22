@@ -5,7 +5,7 @@ using UnityEngine.VFX;
 
 namespace theArch_LD46
 {
-    public class Enemy : MonoBehaviour
+    public class EnemyMono : PlaceableBase
     {
         public bool XAxisPatrolOrZ = true;
 
@@ -44,11 +44,11 @@ namespace theArch_LD46
 
         void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            if (!hit.collider.gameObject.GetComponent<PlayerScript>())
+            if (!hit.collider.gameObject.GetComponent<PlayerMono>())
             {
-                if (!hit.collider.gameObject.GetComponent<PickUpScript>())
+                if (!hit.collider.gameObject.GetComponent<PickUpMono>())
                 {
-                    if (!hit.collider.gameObject.GetComponent<Enemy>())
+                    if (!hit.collider.gameObject.GetComponent<EnemyMono>())
                     {
                         GoForward = !GoForward;
                     }

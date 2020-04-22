@@ -24,7 +24,7 @@ namespace theArch_LD46
 
         public GameMgr gameMgr;
         //public Transform playerTransform;
-        public PlayerScript player;
+        public PlayerMono player;
 
         public RectTransform VisionBlocker;
 
@@ -38,12 +38,14 @@ namespace theArch_LD46
         public EnergyBar feelingBar;
         public EnergyBar compassBar;
 
+        private Dictionary<SenseType, EnergyBar> energyBars;
+
         public Transform GoalTransform;
         public RectTransform GoalInd;
 
         public GameObject GameOverPanel;
 
-        private List<PickUpScript> nearestPickUp;
+        private List<PickUpMono> nearestPickUp;
         private int nearestPickUpCount;
 
         public Transform GoalTrans;
@@ -80,6 +82,13 @@ namespace theArch_LD46
         // Start is called before the first frame update
         void Start()
         {
+            energyBars=new Dictionary<SenseType, EnergyBar>()
+            {
+                { SenseType.Vision,visionBar},
+                { SenseType.Audio,hearingBar},
+                { SenseType.Compass,compassBar},
+                { SenseType.Feeling,feelingBar},
+            };
             if (!theArch_LD46.theArch_LD46_Time.firstTimeGame)
             {
                 InitUIForPlay();
@@ -159,13 +168,13 @@ namespace theArch_LD46
                         EnemyInds[i].GetComponent<RectTransform>().position =
                             RectTransformUtility.WorldToScreenPoint(Camera.main,
                                 gameMgr.Enemies[i].transform.position + EnemyOffset);
-                        EnemyInds[i].GetComponent<Image>().color = new Color(1.0f, 0.0f, 0.0f, player.AudioVal);
+                        EnemyInds[i].GetComponent<Image>().color = new Color(1.0f, 0.0f, 0.0f, player.GetValBySenseType(SenseType.Audio));
                     }
                 }
 
                 if (gameMgr.PickUps != null)
                 {
-                    nearestPickUp = new List<PickUpScript>();
+                    nearestPickUp = new List<PickUpMono>();
                     if (gameMgr.PickUps.Count > PickUpInds.Count)
                     {
                         do
@@ -186,11 +195,11 @@ namespace theArch_LD46
                         nearestPickUp.Add(gameMgrPickUp);
                     }
 
-                    PickUpScript[] sortedPickups = nearestPickUp
+                    PickUpMono[] sortedPickups = nearestPickUp
                         .OrderBy(v => (v.transform.position - player.transform.position).magnitude)
-                        .ToArray<PickUpScript>();
+                        .ToArray<PickUpMono>();
 
-                    nearestPickUpCount = Mathf.Min(Mathf.RoundToInt(6 * player.FeelingVal), sortedPickups.Length);
+                    nearestPickUpCount = Mathf.Min(Mathf.RoundToInt(6 * player.GetValBySenseType(SenseType.Feeling)), sortedPickups.Length);
 
                     for (int i = 0; i < PickUpInds.Count; i++)
                     {
@@ -210,48 +219,35 @@ namespace theArch_LD46
                     }
                 }
 
-                /*if (player.IsMoving)
-                {
-                    visionBar.SetBarFrameColor(Color.red);
-                    hearingBar.SetBarFrameColor(Color.red);
-                    feelingBar.SetBarFrameColor(Color.red);
-                    compassBar.SetBarFrameColor(Color.red);
-                }
-                else
-                {
-                    visionBar.SetBarFrameColor(Color.white);
-                    hearingBar.SetBarFrameColor(Color.white);
-                    feelingBar.SetBarFrameColor(Color.white);
-                    compassBar.SetBarFrameColor(Color.white);
-                }*/
-
                 float visionRag = Mathf.Lerp(1.0f, 4.0f, VisionStrength);
 
                 VisionBlocker.position =
                     RectTransformUtility.WorldToScreenPoint(Camera.main, player.transform.position + PlayerOffset);
-                VisionStrength = player.VisionVal;
+                VisionStrength = player.GetValBySenseType(SenseType.Vision);
                 VisionBlocker.localScale = new Vector3(visionRag, visionRag, 1.0f);
                 VisionBlocker.GetComponent<Image>().color = new Color(0.0f, 0.0f, 0.0f, 1.0f - VisionStrength);
 
-                visionBar.SetBlockFrameColor(GenColorsByVal(player.VisionVal));
-                hearingBar.SetBlockFrameColor(GenColorsByVal(player.AudioVal));
-                feelingBar.SetBlockFrameColor(GenColorsByVal(player.FeelingVal));
-                compassBar.SetBlockFrameColor(GenColorsByVal(player.CompassVal));
+                foreach (var senseType in StaticData.SenseTypesEnumerable)
+                {
+                    energyBars.TryGetValue(senseType, out EnergyBar value);
+                    System.Diagnostics.Debug.Assert(value != null, nameof(value) + " != null");
+                    value.SetBlockFrameColor(GenColorsByVal(player.GetValBySenseType(senseType)));
+                }
 
                 Vector3 dirGoal = GoalTransform.position - player.transform.position;
                 GoalInd.rotation = Quaternion.Euler(0, 0, GetSignedAngle(player.MoveForward, player.MoveLeft, dirGoal));
-                GoalInd.GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, player.CompassVal);
+                GoalInd.GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, player.GetValBySenseType(SenseType.Compass));
 
             }
             else
             {
-                if (Input.GetButtonDown(StaticName.INPUT_BUTTON_NAME_GAME_START))
+                if (Input.GetButtonDown(StaticData.INPUT_BUTTON_NAME_GAME_START))
                 {
                     //Debug.Log("Enter");
                     if (player.GameComplete)
                     {
                         theArch_LD46.theArch_LD46_Time.firstTimeGame = true;
-                        SceneManager.LoadScene(StaticName.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
+                        SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
                         return;
                     }
                     theArch_LD46.theArch_LD46_Time.firstTimeGame = false;

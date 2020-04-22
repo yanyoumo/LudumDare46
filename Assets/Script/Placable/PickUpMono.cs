@@ -6,7 +6,7 @@ using Random = System.Random;
 
 namespace theArch_LD46
 {
-    public class PickUpScript : MonoBehaviour
+    public class PickUpMono : PlaceableBase
     {
         public SenseType senseType;// { private set; get; }
 

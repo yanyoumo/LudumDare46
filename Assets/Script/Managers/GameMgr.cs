@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using theArch_LD46;
+using theArch_LD46.GlobalHelper;
 using UnityEngine;
 
 namespace theArch_LD46
@@ -10,8 +11,8 @@ namespace theArch_LD46
         public GameObject EnemyRoot;
         public GameObject PickUpRoot;
         public GameObject EnemyTemplate;
-        public List<Enemy> Enemies { private set; get; }
-        public List<PickUpScript> PickUps { private set; get; }
+        public List<EnemyMono> Enemies { private set; get; }
+        public List<PickUpMono> PickUps { private set; get; }
 
         public AudioSource MenuBGM;
         public AudioSource PlayingBGM;
@@ -29,22 +30,21 @@ namespace theArch_LD46
             theArch_LD46.theArch_LD46_Time.Time = Time.timeSinceLevelLoad;
             theArch_LD46.theArch_LD46_Time.delTime = Time.deltaTime;
 
-            Enemies = new List<Enemy>();
-            PickUps = new List<PickUpScript>();
+            Enemies = new List<EnemyMono>();
+            PickUps = new List<PickUpMono>();
 
             PlayingBGM.Play();
-            //AudioSource.PlayClipAtPoint(audioClip, Vector3.zero);
         }
 
         // Start is called before the first frame update
         void Start()
         {
-            Enemy[] enemies = EnemyRoot.GetComponentsInChildren<Enemy>();
-            foreach (var enemy in enemies)
+            EnemyMono[] enemiesMono = EnemyRoot.GetComponentsInChildren<EnemyMono>();
+            foreach (var enemy in enemiesMono)
             {
                 Enemies.Add(enemy);
             }
-            PickUpScript[] pickUps = PickUpRoot.GetComponentsInChildren<PickUpScript>();
+            PickUpMono[] pickUps = PickUpRoot.GetComponentsInChildren<PickUpMono>();
             foreach (var pickup in pickUps)
             {
                 pickup.gameMgr = this;
