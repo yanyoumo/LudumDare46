@@ -13,11 +13,23 @@ namespace theArch_LD46
         Compass,
     }
 
+    public enum GameStatus
+    {
+        Starting,
+        Playing,
+        Ended
+    }
+
+    public static class theArch_LD46_GameData
+    {
+        public static GameStatus GameStatus = GameStatus.Starting;
+        public static bool firstTimeGame = true;
+    }
+
     public static class theArch_LD46_Time
     {      
         public static float Time;//In second.
         public static float delTime;//In second.
-        public static bool firstTimeGame = true;
     }
 
 }

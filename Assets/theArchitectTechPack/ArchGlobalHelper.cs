@@ -15,6 +15,13 @@ namespace theArchitectTechPack.GlobalHelper
 
     public static partial class Utils
     {
+
+        public static bool  MathFloatApproxZero(float a)
+        {
+            return Mathf.Approximately(a,0.0f);
+        }
+
+        [CanBeNull]
         public static IEnumerable<T> GetEnumValuesAsArray<T>()
         {
             return Enum.GetValues(typeof(T)).Cast<T>();

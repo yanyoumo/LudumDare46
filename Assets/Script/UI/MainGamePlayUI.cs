@@ -89,7 +89,7 @@ namespace theArch_LD46
                 { SenseType.Compass,compassBar},
                 { SenseType.Feeling,feelingBar},
             };
-            if (!theArch_LD46.theArch_LD46_Time.firstTimeGame)
+            if (!theArch_LD46.theArch_LD46_GameData.firstTimeGame)
             {
                 InitUIForPlay();
             }
@@ -100,7 +100,7 @@ namespace theArch_LD46
             Debug.Assert(gameMgr);
             EnemyInds = new List<GameObject>();
             PickUpInds = new List<GameObject>();
-            player.Toplay();
+            player.ToPlay();
 
             GoalTrans.gameObject.SetActive(true);
             VisionTransform.gameObject.SetActive(true);
@@ -246,11 +246,11 @@ namespace theArch_LD46
                     //Debug.Log("Enter");
                     if (player.GameComplete)
                     {
-                        theArch_LD46.theArch_LD46_Time.firstTimeGame = true;
+                        theArch_LD46.theArch_LD46_GameData.firstTimeGame = true;
                         SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
                         return;
                     }
-                    theArch_LD46.theArch_LD46_Time.firstTimeGame = false;
+                    theArch_LD46.theArch_LD46_GameData.firstTimeGame = false;
                     InitUIForPlay();
                 }
             }

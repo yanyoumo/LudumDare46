@@ -801,18 +801,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Campos: {fileID: 1613675136}
-  VisionVal: 0
-  speed: 18
-  delVal: 0.1
-  IsMoving: 0
-  charCtrl: {fileID: 1752984394}
-  meshRoot: {fileID: 3903469275313284313}
-  HintArrowPlane: {fileID: 4381713107281657905}
+  MeshRoot: {fileID: 3903469275313284313}
   BlurPlane: {fileID: 5229692961368384570}
-  Playing: 0
-  GameComplete: 0
-  pickUpSFX: {fileID: 962491896}
-  vf: {fileID: 8533753416617674042}
+  CharCtrl: {fileID: 1752984394}
+  PickUpSfx: {fileID: 962491896}
+  Vf: {fileID: 8533753416617674042}
 --- !u!143 &1752984394
 CharacterController:
   m_ObjectHideFlags: 0
