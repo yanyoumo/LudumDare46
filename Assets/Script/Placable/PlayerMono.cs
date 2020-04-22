@@ -24,7 +24,7 @@ namespace theArch_LD46
         public float FeelingVal { private set; get; }
         public float CompassVal { private set; get; }*/
 
-        private float Speed = 0.75f;
+        private float Speed = 18.0f;
         private float DelVal = 0.07f;
 
         public bool IsMoving = false;
