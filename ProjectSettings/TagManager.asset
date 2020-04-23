@@ -13,11 +13,11 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - CameraMass
+  - PlayerBlocker
+  - PickUp
+  - Enemy
+  - Player
   - 
   - 
   - 

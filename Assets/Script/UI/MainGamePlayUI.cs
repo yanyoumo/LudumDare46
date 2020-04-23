@@ -165,6 +165,8 @@ namespace theArch_LD46
 
                     for (int i = 0; i < EnemyInds.Count; i++)
                     {
+                        //TODO 要加一种，就是如果再背后，就在UI最下面显示一些。正面和左右不用，就背后。
+                        //TODO 还要添加一些根据距离的的变化算法。
                         EnemyInds[i].GetComponent<RectTransform>().position =
                             RectTransformUtility.WorldToScreenPoint(Camera.main,
                                 gameMgr.Enemies[i].transform.position + EnemyOffset);
@@ -220,12 +222,11 @@ namespace theArch_LD46
                 }
 
                 float visionRag = Mathf.Lerp(1.0f, 4.0f, VisionStrength);
-
-                VisionBlocker.position =
-                    RectTransformUtility.WorldToScreenPoint(Camera.main, player.transform.position + PlayerOffset);
-                VisionStrength = player.GetValBySenseType(SenseType.Vision);
+                //TODO 得再加一层，只不过就是一个单纯的黑色，要不然还是能从那一圈儿视野里面看到挺多东西的。
                 VisionBlocker.localScale = new Vector3(visionRag, visionRag, 1.0f);
+                VisionStrength = player.GetValBySenseType(SenseType.Vision);
                 VisionBlocker.GetComponent<Image>().color = new Color(0.0f, 0.0f, 0.0f, 1.0f - VisionStrength);
+                
 
                 foreach (var senseType in StaticData.SenseTypesEnumerable)
                 {

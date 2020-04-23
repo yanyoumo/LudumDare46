@@ -23,7 +23,7 @@ namespace theArch_LD46
         private float _speed = 18.0f;
         private float _delVal = 0.115f;
 
-        public Transform Campos { private set; get; }
+        public Transform Campos;// { private set; get; }
         public Transform MeshRoot { private set; get; }
         public Transform BlurPlane { private set; get; }
         private CharacterController _charCtrl;
@@ -41,10 +41,13 @@ namespace theArch_LD46
         private readonly float _playerMovingEffectPropertyVal_MovingSpawnRate = 320.0f;
 
         private Camera MainCam;
+        private float mainCamOrgDis;
+
+        public MeshRenderer body;
 
         public void ToPlay()
         {
-            BlurPlane.gameObject.SetActive(false);
+            BlurPlane?.gameObject.SetActive(false);
             Playing = true;
         }
 
@@ -79,6 +82,7 @@ namespace theArch_LD46
             }
 
             MoveForward = Vector3.Normalize(new Vector3(Camera.main.transform.forward.x, 0.0f, Camera.main.transform.forward.z));
+            //MoveForward = Vector3.Normalize(new Vector3(camDel.x, 0.0f, camDel.z));
             MoveLeft = Vector3.Cross(MoveForward, Vector3.up);
 
             PlayerSenseValues = new Dictionary<SenseType, float>();
@@ -96,15 +100,18 @@ namespace theArch_LD46
         {
             MainCam = Camera.main;
             GameComplete = false;
-            BlurPlane.gameObject.SetActive(true);
+            BlurPlane?.gameObject.SetActive(true);
             if (!theArch_LD46_GameData.firstTimeGame)
             {               
                 ToPlay();
             }
+
+            mainCamOrgDis = (Campos.transform.position - Camera.main.transform.position).magnitude;
         }
 
         void UpdateBasicData()
         {
+            //MoveForward = transform.forward;
             MoveForward = Vector3.Normalize(new Vector3(MainCam.transform.forward.x, 0.0f, MainCam.transform.forward.z));
             MoveLeft = Vector3.Cross(MoveForward, Vector3.up);
         }
@@ -119,7 +126,10 @@ namespace theArch_LD46
 
         void UpdateRotatingInput()
         {
-            transform.Rotate(0, -Input.GetAxis(StaticData.INPUT_AXIS_NAME_LOOK_LEFT), 0);
+
+            transform.Rotate(0, Input.GetAxis("Mouse X") * 2.0f, 0);
+            Campos.transform.Translate(0, Input.GetAxis("Mouse Y") * 0.2f, 0);
+            //transform.Rotate(0, -Input.GetAxis(StaticData.INPUT_AXIS_NAME_LOOK_LEFT), 0);
         }
 
         void UpdateGetIsMoving()
@@ -133,6 +143,10 @@ namespace theArch_LD46
         {
             foreach (var senseType in StaticData.SenseTypesEnumerable)
             {
+                /*if (senseType==SenseType.Vision)
+                {
+                    continue;
+                }*/
                 PlayerSenseValues.TryGetValue(senseType, out float val);
                 val -= _delVal * theArch_LD46_Time.delTime;
                 val = Mathf.Clamp01(val);
@@ -149,6 +163,8 @@ namespace theArch_LD46
         // Update is called once per frame
         void Update()
         {
+            //Debug.Log(Input.GetAxis("Mouse X"));
+            //Debug.Log(Input.GetAxis("Mouse Y"));
             if (Playing)
             {
                 UpdateBasicData();
@@ -156,6 +172,11 @@ namespace theArch_LD46
                 UpdateRotatingInput();
                 UpdateGetIsMoving();
                 UpdateSenseVal();
+
+                float _ditheringStr = 1-(Campos.transform.position - Camera.main.transform.position).magnitude /
+                                      mainCamOrgDis;
+
+                body.material.SetFloat("_DitheringStr", _ditheringStr);
             }
         }
 
@@ -175,12 +196,12 @@ namespace theArch_LD46
             if (other.gameObject.GetComponent<EnemyMono>())
             {
                 SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
-                BlurPlane.gameObject.SetActive(false);
+                BlurPlane?.gameObject.SetActive(false);
                 Playing = true;
             }
             else if (other.gameObject.GetComponent<GoalMono>())
             {
-                BlurPlane.gameObject.SetActive(true);
+                BlurPlane?.gameObject.SetActive(true);
                 Playing = false;
                 GameComplete = true;
             }
