@@ -15,8 +15,8 @@ namespace theArch_LD46
         public Vector3 MoveForward { private set; get; }
         public Vector3 MoveLeft { private set; get; }
         public bool IsMoving { private set; get; }
-        public bool Playing { private set; get; }
-        public bool GameComplete { private set; get; }
+        //public bool Playing { private set; get; }
+        //public bool GameComplete { private set; get; }
 
         public Dictionary<SenseType,float> PlayerSenseValues{ private set; get; }
 
@@ -40,16 +40,17 @@ namespace theArch_LD46
         private readonly Vector3 _playerMovingEffectPropertyVal_PlayerPosOffset = new Vector3(0.0f, 0.5f, 0.0f);
         private readonly float _playerMovingEffectPropertyVal_MovingSpawnRate = 320.0f;
 
+        private Vector3 movingVec;
+
         private Camera MainCam;
 
         //TODO 意外地相当相当靠谱，可以把材质的颜色在写一下，还有就是这个也到不能解决看到旁边的地形的问题，但是这个表现比UI的好太多了。
         public Transform curtainMesh;
 
-        public void ToPlay()
+        /*public void ToPlay()
         {
             BlurPlane.gameObject.SetActive(false);
-            Playing = true;
-        }
+        }*/
 
         void Awake()
         {
@@ -92,17 +93,18 @@ namespace theArch_LD46
                 PlayerSenseValues.Add(senseType, DesignerStaticData.GetSenseInitialVal(senseType));
             }
 
+            movingVec=Vector3.zero;
         }
 
         // Start is called before the first frame update
         void Start()
         {
             MainCam = Camera.main;
-            GameComplete = false;
+            //GameComplete = false;
             BlurPlane.gameObject.SetActive(true);
-            if (!theArch_LD46_GameData.firstTimeGame)
-            {               
-                ToPlay();
+            if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
+            {
+                BlurPlane.gameObject.SetActive(false);
             }
         }
 
@@ -115,16 +117,24 @@ namespace theArch_LD46
         void UpdateMovingInput()
         {
             Vector2 inputVec = new Vector2(Input.GetAxis(StaticData.INPUT_AXIS_NAME_FORWARD),Input.GetAxis(StaticData.INPUT_AXIS_NAME_LEFT));
-            Vector3 movingVec = (Input.GetAxis(StaticData.INPUT_AXIS_NAME_FORWARD) * MoveForward) + (inputVec.y * MoveLeft);
-            movingVec = Vector3.Normalize(movingVec) * _speed * theArch_LD46_Time.delTime;
-            _charCtrl.Move(movingVec);
+            movingVec = (Input.GetAxis(StaticData.INPUT_AXIS_NAME_FORWARD) * MoveForward) + (inputVec.y * MoveLeft);
+            movingVec = Vector3.Normalize(movingVec);
+        }
+
+        void ActualMoving()
+        {
+            CollisionFlags res = _charCtrl.Move(movingVec * _speed * theArch_LD46_Time.delTime);
+            IsMoving = (res == CollisionFlags.None);
+            movingVec =Vector3.zero;
         }
 
         void UpdateRotatingInput()
         {
+            //TODO 这个也要优化，但是优先级不高了。
             transform.Rotate(0, -Input.GetAxis(StaticData.INPUT_AXIS_NAME_LOOK_LEFT), 0);
         }
 
+        [Obsolete]
         void UpdateGetIsMoving()
         {          
             bool moving = !Utils.MathFloatApproxZero(Input.GetAxis(StaticData.INPUT_AXIS_NAME_FORWARD)) || !Utils.MathFloatApproxZero(Input.GetAxis(StaticData.INPUT_AXIS_NAME_LEFT));
@@ -152,14 +162,14 @@ namespace theArch_LD46
         // Update is called once per frame
         void Update()
         {
-            if (Playing)
+            if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
             {
                 UpdateBasicData();
                 UpdateMovingInput();
                 UpdateRotatingInput();
-                UpdateGetIsMoving();
                 UpdateSenseVal();
 
+                //TODO 哦哦，变成这里了，还得想想怎么弄。
                 float curtainScale = Mathf.Lerp(1.0f, 7.5f, GetValBySenseType(SenseType.Vision));
                 curtainMesh.transform.localScale = new Vector3(curtainScale, 1.0f, curtainScale);
             }
@@ -167,7 +177,11 @@ namespace theArch_LD46
 
         void LateUpdate()
         {
-            UpdateVisualEffect();
+            if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
+            {
+                ActualMoving();
+                UpdateVisualEffect();
+            }
         }
 
         public float GetValBySenseType(SenseType senseType)
@@ -183,13 +197,11 @@ namespace theArch_LD46
             {
                 SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
                 BlurPlane.gameObject.SetActive(false);
-                Playing = true;
             }
             else if (other.gameObject.GetComponent<GoalMono>())
             {
                 BlurPlane.gameObject.SetActive(true);
-                Playing = false;
-                GameComplete = true;
+                theArch_LD46_GameData.GameStatus = GameStatus.Ended;
             }
             else if (other.gameObject.GetComponent<PickUpMono>())
             {

@@ -23,7 +23,7 @@ namespace theArch_LD46
     public static class theArch_LD46_GameData
     {
         public static GameStatus GameStatus = GameStatus.Starting;
-        public static bool firstTimeGame = true;
+        //public static bool firstTimeGame = true;
     }
 
     public static class theArch_LD46_Time

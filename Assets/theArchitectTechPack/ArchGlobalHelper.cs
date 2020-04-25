@@ -15,8 +15,28 @@ namespace theArchitectTechPack.GlobalHelper
 
     public static partial class Utils
     {
+        public static float GetSignedAngle(Vector3 from, Vector3 left, Vector3 to)
+        {
+            return Mathf.Sign(Vector3.Dot(to, left)) * Vector3.Angle(from, to);
+        }
 
-        public static bool  MathFloatApproxZero(float a)
+        public static IEnumerable<T> SmarterTruncateArray<T>(int takeCount, IEnumerable<T> sortedList)
+        {
+            T[] res;
+            if (takeCount != -1 && takeCount <= sortedList.Count())
+            {
+                res = new T[takeCount];
+                res = sortedList.Take(takeCount).ToArray();
+            }
+            else
+            {
+                res = sortedList.ToArray();
+            }
+
+            return res;
+        }
+
+        public static bool MathFloatApproxZero(float a)
         {
             return Mathf.Approximately(a,0.0f);
         }

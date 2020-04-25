@@ -80,7 +80,7 @@ namespace theArch_LD46
         {
             if (pendingDead)
             {
-                gameMgr.PickUps.Remove(this);
+                gameMgr.SortedPickUps.Remove(this);
                 Destroy(gameObject);
             }
 

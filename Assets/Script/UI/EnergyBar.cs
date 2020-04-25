@@ -41,15 +41,18 @@ namespace theArch_LD46
 
         public void SetBlockFrameColor(Color[] col)
         {
-            for (int i = 0; i < blockImages.Length; i++)
+            if (blockImages != null)
             {
-                if (i<col.Length)
+                for (int i = 0; i < blockImages.Length; i++)
                 {
-                    blockImages[i].color = col[i];
-                }
-                else
-                {
-                    blockImages[i].color = Color.gray;
+                    if (i < col.Length)
+                    {
+                        blockImages[i].color = col[i];
+                    }
+                    else
+                    {
+                        blockImages[i].color = Color.gray;
+                    }
                 }
             }
         }

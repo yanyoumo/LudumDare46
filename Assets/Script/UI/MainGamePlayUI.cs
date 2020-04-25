@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Cinemachine;
+using theArchitectTechPack.GlobalHelper;
 using theArch_LD46.GlobalHelper;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -46,7 +47,7 @@ namespace theArch_LD46
         public GameObject GameOverPanel;
 
         private List<PickUpMono> nearestPickUp;
-        private int nearestPickUpCount;
+        //private int nearestPickUpCount;
 
         public Transform GoalTrans;
         public Transform DataTransform;
@@ -79,9 +80,16 @@ namespace theArch_LD46
             return res;
         }
 
+        void Awake()
+        {
+            //果然又被新建了一遍。
+            //DontDestroyOnLoad(this);
+        }
+
         // Start is called before the first frame update
         void Start()
         {
+            Debug.Log("UI invoked");
             energyBars=new Dictionary<SenseType, EnergyBar>()
             {
                 { SenseType.Vision,visionBar},
@@ -89,18 +97,18 @@ namespace theArch_LD46
                 { SenseType.Compass,compassBar},
                 { SenseType.Feeling,feelingBar},
             };
-            if (!theArch_LD46.theArch_LD46_GameData.firstTimeGame)
+            if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
             {
                 InitUIForPlay();
             }
         }
 
-        private void InitUIForPlay()
+        public void InitUIForPlay()
         {
             Debug.Assert(gameMgr);
             EnemyInds = new List<GameObject>();
             PickUpInds = new List<GameObject>();
-            player.ToPlay();
+            //player.ToPlay();
 
             GoalTrans.gameObject.SetActive(true);
             VisionTransform.gameObject.SetActive(true);
@@ -117,11 +125,6 @@ namespace theArch_LD46
             compassBar.SetBarFrameColor(Color.white);
 
             GameStartTransform.gameObject.SetActive(false);
-        }
-
-        private float GetSignedAngle(Vector3 from, Vector3 left ,Vector3 to)
-        {
-            return Mathf.Sign(Vector3.Dot(to, left)) * Vector3.Angle(from, to);
         }
 
         private Sprite getTexBySenseType(SenseType senseType)
@@ -141,131 +144,73 @@ namespace theArch_LD46
             }
         }
 
-        // Update is called once per frame
-        void Update()
+        void ResizeAndEnableInds(int targetCount,ref List<GameObject> array, GameObject template, Transform parent)
         {
-            if (player.Playing)
+            Debug.Assert(targetCount >= 0);
+            while (targetCount > array.Count)
             {
-                if (gameMgr.Enemies != null)
-                {
-                    if (gameMgr.Enemies.Count > EnemyInds.Count)
-                    {
-                        do
-                        {
-                            EnemyInds.Add(Instantiate(EnemyIndTemplate, transform));
-                        } while (gameMgr.Enemies.Count > EnemyInds.Count);
-                    }
-                    else
-                    {
-                        for (int i = 0; i < EnemyInds.Count; i++)
-                        {
-                            EnemyInds[i].gameObject.SetActive(i < gameMgr.Enemies.Count);
-                        }
-                    }
+                array.Add(Instantiate(template, parent));
+            } 
 
-                    for (int i = 0; i < EnemyInds.Count; i++)
+            for (int i = 0; i < array.Count; i++)
+            {
+                array[i].gameObject.SetActive(i < targetCount);
+            }
+        }
+
+        // Update is called once per frame
+        void OnGUI()
+        {
+            if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
+            {
+                if (gameMgr.dataReady)
+                {
+                    //TODO 这里的Count外面应该处理掉。
+                    int feelingCount = gameMgr.FilteredSortedPickUpsData.Length;
+                    float feelingAlpha = gameMgr.senseDisplayingData.FeelingAlpha;
+                    int hearingCount = gameMgr.FilteredSortedEnemiesPos.Length;
+                    float hearingAlpha = gameMgr.senseDisplayingData.HearingAlpha;
+                    float compassAlpha = gameMgr.senseDisplayingData.CompassAlpha;
+
+                    ResizeAndEnableInds(hearingCount, ref EnemyInds, EnemyIndTemplate, transform);
+                    ResizeAndEnableInds(feelingCount, ref PickUpInds, PickUpIndTemplate, transform);
+
+                    for (var i = 0; i < gameMgr.FilteredSortedEnemiesPos.Length; i++)
                     {
                         EnemyInds[i].GetComponent<RectTransform>().position =
                             RectTransformUtility.WorldToScreenPoint(Camera.main,
-                                gameMgr.Enemies[i].transform.position + EnemyOffset);
-                        EnemyInds[i].GetComponent<Image>().color = new Color(1.0f, 0.0f, 0.0f, player.GetValBySenseType(SenseType.Audio));
+                                gameMgr.FilteredSortedEnemiesPos[i] + EnemyOffset);
+                        EnemyInds[i].GetComponent<Image>().color = new Color(1.0f, 0.0f, 0.0f, hearingAlpha);
+                    }
+
+                    for (var i = 0; i < gameMgr.FilteredSortedPickUpsData.Length; i++)
+                    {
+                        PickUpInds[i].GetComponent<RectTransform>().rotation =
+                            Quaternion.Euler(0, 0, gameMgr.FilteredSortedPickUpsData[i].angle);
+                        PickUpInds[i].GetComponentsInChildren<Image>()[1].sprite =
+                            getTexBySenseType(gameMgr.FilteredSortedPickUpsData[i].senseType);
+                    }
+
+                    //Vector3 dirGoal = GoalTransform.position - player.transform.position;
+                    GoalInd.rotation = Quaternion.Euler(0, 0, gameMgr.playerGoalAngle);
+                    GoalInd.GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, compassAlpha);
+
+                    foreach (var senseType in StaticData.SenseTypesEnumerable)
+                    {
+                        energyBars.TryGetValue(senseType, out EnergyBar value);
+                        System.Diagnostics.Debug.Assert(value != null, nameof(value) + " != null");
+                        value.SetBlockFrameColor(GenColorsByVal(player.GetValBySenseType(senseType)));
                     }
                 }
-
-                if (gameMgr.PickUps != null)
-                {
-                    nearestPickUp = new List<PickUpMono>();
-                    if (gameMgr.PickUps.Count > PickUpInds.Count)
-                    {
-                        do
-                        {
-                            PickUpInds.Add(Instantiate(PickUpIndTemplate, transform));
-                        } while (gameMgr.PickUps.Count > PickUpInds.Count);
-                    }
-                    else
-                    {
-                        for (int i = 0; i < PickUpInds.Count; i++)
-                        {
-                            PickUpInds[i].gameObject.SetActive(i < gameMgr.PickUps.Count);
-                        }
-                    }
-
-                    foreach (var gameMgrPickUp in gameMgr.PickUps)
-                    {
-                        nearestPickUp.Add(gameMgrPickUp);
-                    }
-
-                    PickUpMono[] sortedPickups = nearestPickUp
-                        .OrderBy(v => (v.transform.position - player.transform.position).magnitude)
-                        .ToArray<PickUpMono>();
-
-                    nearestPickUpCount = Mathf.Min(Mathf.RoundToInt(6 * player.GetValBySenseType(SenseType.Feeling)), sortedPickups.Length);
-
-                    for (int i = 0; i < PickUpInds.Count; i++)
-                    {
-                        if (i < nearestPickUpCount)
-                        {
-                            PickUpInds[i].gameObject.SetActive(true);
-                            Vector3 dirPick = sortedPickups[i].transform.position - player.transform.position;
-                            PickUpInds[i].GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0,
-                                GetSignedAngle(player.MoveForward, player.MoveLeft, dirPick));
-                            PickUpInds[i].GetComponentsInChildren<Image>()[1].sprite =
-                                getTexBySenseType(sortedPickups[i].senseType);
-                        }
-                        else
-                        {
-                            PickUpInds[i].gameObject.SetActive(false);
-                        }
-                    }
-                }
-
-                float visionRag = Mathf.Lerp(1.0f, 4.0f, VisionStrength);
-
-                VisionBlocker.position =
-                    RectTransformUtility.WorldToScreenPoint(Camera.main, player.transform.position + PlayerOffset);
-                VisionStrength = player.GetValBySenseType(SenseType.Vision);
-                VisionBlocker.localScale = new Vector3(visionRag, visionRag, 1.0f);
-                //VisionBlocker.GetComponent<Image>().color = new Color(0.0f, 0.0f, 0.0f, 1.0f - VisionStrength);
-                VisionBlocker.GetComponent<Image>().color = new Color(0.0f, 0.0f, 0.0f, 0.0f);
-
-                foreach (var senseType in StaticData.SenseTypesEnumerable)
-                {
-                    energyBars.TryGetValue(senseType, out EnergyBar value);
-                    System.Diagnostics.Debug.Assert(value != null, nameof(value) + " != null");
-                    value.SetBlockFrameColor(GenColorsByVal(player.GetValBySenseType(senseType)));
-                }
-
-                Vector3 dirGoal = GoalTransform.position - player.transform.position;
-                GoalInd.rotation = Quaternion.Euler(0, 0, GetSignedAngle(player.MoveForward, player.MoveLeft, dirGoal));
-                GoalInd.GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, player.GetValBySenseType(SenseType.Compass));
-
-            }
-            else
-            {
-                if (Input.GetButtonDown(StaticData.INPUT_BUTTON_NAME_GAME_START))
-                {
-                    //Debug.Log("Enter");
-                    if (player.GameComplete)
-                    {
-                        theArch_LD46.theArch_LD46_GameData.firstTimeGame = true;
-                        SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
-                        return;
-                    }
-                    theArch_LD46.theArch_LD46_GameData.firstTimeGame = false;
-                    InitUIForPlay();
-                }
-            }
-
-            if (player.GameComplete)
+            }else if (theArch_LD46_GameData.GameStatus == GameStatus.Ended)
             {
                 for (int i = 0; i < this.transform.childCount; i++)
                 {
-                    if (i != 3)
+                    if (i != 3)//TODO 这个就很搓
                     {
-                        this.transform.GetChild(i).gameObject.SetActive(false);
+                        transform.GetChild(i).gameObject.SetActive(false);
                     }
                 }
-
                 GameOverPanel.gameObject.SetActive(true);
             }
         }
