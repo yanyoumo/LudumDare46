@@ -20,7 +20,7 @@ namespace theArch_LD46
         //public bool GameComplete { private set; get; }
 
         public Dictionary<SenseType,float> PlayerSenseValues{ private set; get; }
-        public bool PlayerDead{ private set; get; }
+        public bool PlayerDead{ set; get; }
 
 
     private float _speed = 18.0f;
@@ -29,6 +29,8 @@ namespace theArch_LD46
         public Transform Campos { private set; get; }
         public Transform MeshRoot { private set; get; }
         public Transform BlurPlane { private set; get; }
+        public bool Won { get; set; }
+
         private CharacterController _charCtrl;
         private AudioSource _pickUpSfx;
         private VisualEffect _playerMovingEffect;
@@ -66,6 +68,7 @@ namespace theArch_LD46
 
             movingVec = Vector3.zero;
             PlayerDead = false;
+            Won = false;
         }
 
         void Awake()
@@ -105,10 +108,10 @@ namespace theArch_LD46
         void Start()
         {
             MainCam = Camera.main;
-            BlurPlane.gameObject.SetActive(true);
+            BlurPlane?.gameObject.SetActive(true);
             if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
             {
-                BlurPlane.gameObject.SetActive(false);
+                BlurPlane?.gameObject.SetActive(false);
             }
         }
 
@@ -201,18 +204,19 @@ namespace theArch_LD46
             {
                 //SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
                 PlayerDead = true;
-                BlurPlane.gameObject.SetActive(false);
+                BlurPlane?.gameObject.SetActive(false);
             }
             else if (other.gameObject.GetComponent<GoalMono>())
             {
-                BlurPlane.gameObject.SetActive(true);
-                theArch_LD46_GameData.GameStatus = GameStatus.Ended;
+                Won = true;
+                BlurPlane?.gameObject.SetActive(true);
+                //theArch_LD46_GameData.GameStatus = GameStatus.Ended;
             }
             else if (other.gameObject.GetComponent<PickUpMono>())
             {
                 _pickUpSfx.Play();
                 PickUpMono pickUpMono = other.gameObject.GetComponent<PickUpMono>();
-                Debug.Log("Player got"+pickUpMono.senseType+"PickUp");
+                //Debug.Log("Player got"+pickUpMono.senseType+"PickUp");
                 PlayerSenseValues[pickUpMono.senseType] += pickUpMono.val;
                 pickUpMono.pendingDead = true;
             }

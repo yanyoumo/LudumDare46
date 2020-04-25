@@ -18,9 +18,9 @@ namespace theArch_LD46
         public const string PickUpRootName = "PickUpRoot";
         public const string GoalName = "Goal";
 
-        public Transform PlayerSpawn;
-        public GameObject EnemyRoot;
-        public GameObject PickUpRoot;
+        private Transform PlayerSpawn;
+        private GameObject EnemyRoot;
+        private GameObject PickUpRoot;
         public GameObject EnemyTemplate;
 
         private List<EnemyMono> SortedEnemies { set; get; }
@@ -35,12 +35,15 @@ namespace theArch_LD46
         public PlayerMono player;
         //public AudioSource MenuBGM;
         //public AudioSource PlayingBGM;
-        public bool dataReady = false;
-        public GoalMono GoalTransform;
+        //public bool dataReady = false;
+        private GoalMono GoalTransform;
         private float GroundStretch = 10.0f;
         public MainGamePlayUI gamePlayUI;
 
         public bool levelSwitching { private set; get; }
+
+        private int CurrentLevelID;
+        private int PendingLevelID;
 
         void Awake()
         {
@@ -60,7 +63,9 @@ namespace theArch_LD46
 
         void Start()
         {
-            ReloadLevel();
+            CurrentLevelID = StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV0;
+            PendingLevelID = StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV0;
+            loadPendingLevel();
         }
 
         private void UpdatePlayerSenseData()
@@ -83,15 +88,33 @@ namespace theArch_LD46
             player.ResetResetableData(this);
         }
 
+        int GetNextLevel()
+        {
+            //TODO 类似FSM的机制切换关卡。
+            return StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV1;
+        }
+
+        void LoadNextLevel()
+        {
+            PendingLevelID = GetNextLevel();
+            UnLoadLevel();
+        }
+
+        void ReloadCurrentLevel()
+        {
+            PendingLevelID = CurrentLevelID;
+            UnLoadLevel();
+        }
+
         private void UnLoadLevel()
         {
             levelSwitching = true;
-            SceneManager.UnloadSceneAsync(StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV1);
+            SceneManager.UnloadSceneAsync(CurrentLevelID);
         }
 
-        void ReloadLevel()
+        void loadPendingLevel()
         {
-            SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV1, LoadSceneMode.Additive);
+            SceneManager.LoadScene(PendingLevelID, LoadSceneMode.Additive);
         }
 
         void UpdateLevelContents()
@@ -150,7 +173,7 @@ namespace theArch_LD46
         {
             if (scene.name.ToLower().Contains("_level"))
             {
-                ReloadLevel();
+                loadPendingLevel();
             }
         }
 
@@ -162,6 +185,7 @@ namespace theArch_LD46
 
             if (scene.name.ToLower().Contains("_level"))
             {
+                CurrentLevelID = PendingLevelID;
                 UpdateLevelReference();
                 UpdateLevelContents();
                 levelSwitching = false;
@@ -173,13 +197,20 @@ namespace theArch_LD46
             theArch_LD46_Time.Time = Time.timeSinceLevelLoad;
             theArch_LD46_Time.delTime = Time.deltaTime;
 
-            if (player.PlayerDead)
-            {
-                UnLoadLevel();
-            }
 
             if (!levelSwitching)
             {
+                //Loading的逻辑会在loading中再跑了一圈儿，所以放进来。
+                if (player.PlayerDead)
+                {
+                    ReloadCurrentLevel();
+                }
+
+                if (player.Won)
+                {
+                    LoadNextLevel();
+                }
+
                 //先不管，Additive的时候这些都要改。
                 /*if (theArch_LD46_GameData.GameStatus == GameStatus.Starting)
                 {
@@ -244,10 +275,6 @@ namespace theArch_LD46
 
                     Vector3 dirGoal = GoalTransform.transform.position - player.transform.position;
                     playerGoalAngle = Utils.GetSignedAngle(player.MoveForward, player.MoveLeft, dirGoal);
-                    if (!dataReady)
-                    {
-                        dataReady = true;
-                    }
                 }
             }
         }

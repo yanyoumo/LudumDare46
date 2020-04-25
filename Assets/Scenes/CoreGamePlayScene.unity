@@ -278,7 +278,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Profile: {fileID: 11400000, guid: 9ded8b8006cd8254886095f0995ab7a7, type: 2}
   m_StaticLightingSkyUniqueID: 1
-  m_SkySettings: {fileID: 1337953985}
+  m_SkySettings: {fileID: 1560293526}
   m_SkySettingsFromProfile: {fileID: -1356381860374623851, guid: 9ded8b8006cd8254886095f0995ab7a7,
     type: 2}
 --- !u!4 &852123483
@@ -295,7 +295,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1337953985
+--- !u!114 &1369705166 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3759844902220959508, guid: aa86a7654cd8f2f42b12f88d4a6c94a3,
+    type: 3}
+  m_PrefabInstance: {fileID: 4937259102595237121}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e63f66ae6a23f3d46988acdd9c0bd269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1560293526
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -396,18 +408,6 @@ MonoBehaviour:
   rectLightShadow:
     m_OverrideState: 0
     m_Value: 0
---- !u!114 &1369705166 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3759844902220959508, guid: aa86a7654cd8f2f42b12f88d4a6c94a3,
-    type: 3}
-  m_PrefabInstance: {fileID: 4937259102595237121}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e63f66ae6a23f3d46988acdd9c0bd269, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1752984392 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7336782953451699296, guid: 3eef33a53bdc4ff4199568e388684e07,
@@ -660,17 +660,17 @@ PrefabInstance:
     - target: {fileID: 7162772704565205617, guid: 3eef33a53bdc4ff4199568e388684e07,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 113.66
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7162772704565205617, guid: 3eef33a53bdc4ff4199568e388684e07,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.0032294989
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7162772704565205617, guid: 3eef33a53bdc4ff4199568e388684e07,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.49
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7162772704565205617, guid: 3eef33a53bdc4ff4199568e388684e07,
         type: 3}
