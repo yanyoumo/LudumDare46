@@ -13,6 +13,9 @@ public class BillingBoardFacing : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.rotation = Camera.main.transform.rotation;
+        if (Camera.main)
+        {
+            transform.rotation = Camera.main.transform.rotation;
+        }
     }
 }

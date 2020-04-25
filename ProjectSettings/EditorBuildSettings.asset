@@ -8,4 +8,19 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GamePlayScene.unity
     guid: 7e55285104e820741af61720e1d648a3
+  - enabled: 1
+    path: Assets/Scenes/AdditiveScenePrac/CoreScene.unity
+    guid: 681a7bb076dcec8448ee50d98ca5c1a1
+  - enabled: 1
+    path: Assets/Scenes/AdditiveScenePrac/LevelScene_1.unity
+    guid: 47101857b01331940a56c131d07a9f05
+  - enabled: 1
+    path: Assets/Scenes/CoreGamePlayScene.unity
+    guid: 0f8dffc0616957d4990c9e3ed827161f
+  - enabled: 1
+    path: Assets/Scenes/GamePlayScene_Level0.unity
+    guid: 1dc091b4cdf7e7744b3e2fc046479beb
+  - enabled: 1
+    path: Assets/Scenes/GamePlayScene_Level1.unity
+    guid: 61a8b47fe8d7f164ab387c1701468678
   m_configObjects: {}

@@ -8,7 +8,7 @@ namespace theArch_LD46
 {
     public class PickUpMono : PlaceableBase
     {
-        public SenseType senseType;// { private set; get; }
+        public SenseType senseType; // { private set; get; }
 
         public float val { private set; get; }
 
@@ -16,11 +16,6 @@ namespace theArch_LD46
         public Texture2D senseAudioTexture;
         public Texture2D senseFeelingTexture;
         public Texture2D senseCompassTexture;
-        
-        /*public Mesh senseVisionMesh;
-        public Mesh senseAudioMesh;
-        public Mesh senseFeelingMesh;
-        public Mesh senseCompassMesh;*/
 
         public bool pendingDead = false;
 
@@ -60,6 +55,7 @@ namespace theArch_LD46
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
             labelTrans.GetComponentInChildren<MeshRenderer>().material.SetTexture("_UnlitColorMap", targetTex);
 
             OrgMeshRootPos = MeshRoot.position;

@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.VFX;
 using theArchitectTechPack.GlobalHelper;
+using Object = System.Object;
 
 namespace theArch_LD46
 {
@@ -19,8 +20,10 @@ namespace theArch_LD46
         //public bool GameComplete { private set; get; }
 
         public Dictionary<SenseType,float> PlayerSenseValues{ private set; get; }
+        public bool PlayerDead{ private set; get; }
 
-        private float _speed = 18.0f;
+
+    private float _speed = 18.0f;
         private float _delVal = 0.1f;
 
         public Transform Campos { private set; get; }
@@ -47,10 +50,23 @@ namespace theArch_LD46
         //TODO 意外地相当相当靠谱，可以把材质的颜色在写一下，还有就是这个也到不能解决看到旁边的地形的问题，但是这个表现比UI的好太多了。
         public Transform curtainMesh;
 
-        /*public void ToPlay()
+        public void ResetResetableData(MonoBehaviour invoker)
         {
-            BlurPlane.gameObject.SetActive(false);
-        }*/
+            Debug.Assert(invoker==this|| invoker.GetComponent<GameMgr>(),"Only player and GameMgr could reset player.");
+            MoveForward = Vector3.Normalize(new Vector3(Camera.main.transform.forward.x, 0.0f, Camera.main.transform.forward.z));
+            MoveLeft = Vector3.Cross(MoveForward, Vector3.up);
+
+            PlayerSenseValues = new Dictionary<SenseType, float>();
+
+
+            foreach (var senseType in StaticData.SenseTypesEnumerable)
+            {
+                PlayerSenseValues.Add(senseType, DesignerStaticData.GetSenseInitialVal(senseType));
+            }
+
+            movingVec = Vector3.zero;
+            PlayerDead = false;
+        }
 
         void Awake()
         {
@@ -82,25 +98,13 @@ namespace theArch_LD46
                 }
             }
 
-            MoveForward = Vector3.Normalize(new Vector3(Camera.main.transform.forward.x, 0.0f, Camera.main.transform.forward.z));
-            MoveLeft = Vector3.Cross(MoveForward, Vector3.up);
-
-            PlayerSenseValues = new Dictionary<SenseType, float>();
-
-
-            foreach (var senseType in StaticData.SenseTypesEnumerable)
-            {
-                PlayerSenseValues.Add(senseType, DesignerStaticData.GetSenseInitialVal(senseType));
-            }
-
-            movingVec=Vector3.zero;
+            ResetResetableData(this);
         }
 
         // Start is called before the first frame update
         void Start()
         {
             MainCam = Camera.main;
-            //GameComplete = false;
             BlurPlane.gameObject.SetActive(true);
             if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
             {
@@ -195,7 +199,8 @@ namespace theArch_LD46
         {
             if (other.gameObject.GetComponent<EnemyMono>())
             {
-                SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
+                //SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
+                PlayerDead = true;
                 BlurPlane.gameObject.SetActive(false);
             }
             else if (other.gameObject.GetComponent<GoalMono>())

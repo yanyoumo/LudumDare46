@@ -22,7 +22,7 @@ namespace theArch_LD46
 
     public static class theArch_LD46_GameData
     {
-        public static GameStatus GameStatus = GameStatus.Starting;
+        public static GameStatus GameStatus = GameStatus.Playing;//先强制跳过去
         //public static bool firstTimeGame = true;
     }
 
@@ -47,6 +47,12 @@ namespace theArch_LD46.GlobalHelper
         public static readonly string INPUT_BUTTON_NAME_GAME_START = "GameStart";
 
         public static readonly int SCENE_ID_GAMEPLAY = 0;
+        public static readonly int SCENE_ID_ADDITIVE_CORE = 1;
+        public static readonly int SCENE_ID_ADDITIVE_LV1 = 2;
+
+        public static readonly int SCENE_ID_GAMEPLAY_ADDITIVE_CORE = 3;
+        public static readonly int SCENE_ID_GAMEPLAY_ADDITIVE_LV0 = 4;
+        public static readonly int SCENE_ID_GAMEPLAY_ADDITIVE_LV1 = 5;
 
         static StaticData()
         {

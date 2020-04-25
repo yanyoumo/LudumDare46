@@ -25,14 +25,9 @@ namespace theArch_LD46
 
         public GameMgr gameMgr;
         //public Transform playerTransform;
-        public PlayerMono player;
-
-        public RectTransform VisionBlocker;
-
-        public float VisionStrength = 0.0f;
+        public PlayerMono player;//TODO，要去掉，但是和additive不冲突。
 
         private Vector3 EnemyOffset=new Vector3(0.0f,2.0f,0.0f);
-        private Vector3 PlayerOffset=new Vector3(0.0f,0.98f,0.0f);
 
         public EnergyBar visionBar;
         public EnergyBar hearingBar;
@@ -41,17 +36,12 @@ namespace theArch_LD46
 
         private Dictionary<SenseType, EnergyBar> energyBars;
 
-        public Transform GoalTransform;
         public RectTransform GoalInd;
-
         public GameObject GameOverPanel;
-
-        private List<PickUpMono> nearestPickUp;
-        //private int nearestPickUpCount;
 
         public Transform GoalTrans;
         public Transform DataTransform;
-        public Transform VisionTransform;
+        //public Transform VisionTransform;
 
         public Transform GameStartTransform;
 
@@ -82,8 +72,7 @@ namespace theArch_LD46
 
         void Awake()
         {
-            //果然又被新建了一遍。
-            //DontDestroyOnLoad(this);
+
         }
 
         // Start is called before the first frame update
@@ -108,10 +97,9 @@ namespace theArch_LD46
             Debug.Assert(gameMgr);
             EnemyInds = new List<GameObject>();
             PickUpInds = new List<GameObject>();
-            //player.ToPlay();
 
             GoalTrans.gameObject.SetActive(true);
-            VisionTransform.gameObject.SetActive(true);
+            //VisionTransform.gameObject.SetActive(true);
             DataTransform.gameObject.SetActive(true);
 
             visionBar.SetBlockFrameColor(new[] { Color.gray });
@@ -163,7 +151,7 @@ namespace theArch_LD46
         {
             if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
             {
-                if (gameMgr.dataReady)
+                if (!gameMgr.levelSwitching)
                 {
                     //TODO 这里的Count外面应该处理掉。
                     int feelingCount = gameMgr.FilteredSortedPickUpsData.Length;

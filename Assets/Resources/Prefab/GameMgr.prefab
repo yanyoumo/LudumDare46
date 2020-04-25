@@ -50,9 +50,11 @@ MonoBehaviour:
   EnemyTemplate: {fileID: 4821587717083578587, guid: 87398c911582b4545a7ca6a44351779e,
     type: 3}
   player: {fileID: 0}
-  MenuBGM: {fileID: 1969799493}
-  PlayingBGM: {fileID: 1969799494}
+  MenuBGM: {fileID: 0}
+  PlayingBGM: {fileID: 0}
+  dataReady: 0
   GoalTransform: {fileID: 0}
+  gamePlayUI: {fileID: 0}
 --- !u!82 &1969799493
 AudioSource:
   m_ObjectHideFlags: 0
@@ -60,7 +62,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7126172860892604174}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 754ab344c0af9c34f898258e493f8483, type: 3}
@@ -156,7 +158,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7126172860892604174}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: fbc6b503f0a77ce4d9c425647ff4700b, type: 3}
