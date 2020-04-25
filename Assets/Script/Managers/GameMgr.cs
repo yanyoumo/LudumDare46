@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using theArch_LD46;
-using theArch_LD46.GlobalHelper;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace theArch_LD46
@@ -13,6 +10,11 @@ namespace theArch_LD46
         public GameObject EnemyTemplate;
         public List<EnemyMono> Enemies { private set; get; }
         public List<PickUpMono> PickUps { private set; get; }
+
+        public Vector3 SortedEnemiesDist { private set; get; }
+        public Vector3 SortedPickUpDist { private set; get; }
+
+        public PlayerMono player;
 
         public AudioSource MenuBGM;
         public AudioSource PlayingBGM;
@@ -57,6 +59,8 @@ namespace theArch_LD46
         {
             theArch_LD46.theArch_LD46_Time.Time = Time.timeSinceLevelLoad;
             theArch_LD46.theArch_LD46_Time.delTime = Time.deltaTime;
+
+
         }
 
         void OnDestroy()

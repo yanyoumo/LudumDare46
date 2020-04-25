@@ -21,7 +21,7 @@ namespace theArch_LD46
         public Dictionary<SenseType,float> PlayerSenseValues{ private set; get; }
 
         private float _speed = 18.0f;
-        private float _delVal = 0.115f;
+        private float _delVal = 0.1f;
 
         public Transform Campos { private set; get; }
         public Transform MeshRoot { private set; get; }
@@ -41,6 +41,9 @@ namespace theArch_LD46
         private readonly float _playerMovingEffectPropertyVal_MovingSpawnRate = 320.0f;
 
         private Camera MainCam;
+
+        //TODO 意外地相当相当靠谱，可以把材质的颜色在写一下，还有就是这个也到不能解决看到旁边的地形的问题，但是这个表现比UI的好太多了。
+        public Transform curtainMesh;
 
         public void ToPlay()
         {
@@ -156,6 +159,9 @@ namespace theArch_LD46
                 UpdateRotatingInput();
                 UpdateGetIsMoving();
                 UpdateSenseVal();
+
+                float curtainScale = Mathf.Lerp(1.0f, 7.5f, GetValBySenseType(SenseType.Vision));
+                curtainMesh.transform.localScale = new Vector3(curtainScale, 1.0f, curtainScale);
             }
         }
 
@@ -166,7 +172,8 @@ namespace theArch_LD46
 
         public float GetValBySenseType(SenseType senseType)
         {
-            Debug.Assert(PlayerSenseValues.TryGetValue(senseType, out float val));
+            float val = 0.0f;
+            PlayerSenseValues.TryGetValue(senseType, out val);
             return val;
         }
 

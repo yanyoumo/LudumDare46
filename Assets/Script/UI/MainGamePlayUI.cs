@@ -225,7 +225,8 @@ namespace theArch_LD46
                     RectTransformUtility.WorldToScreenPoint(Camera.main, player.transform.position + PlayerOffset);
                 VisionStrength = player.GetValBySenseType(SenseType.Vision);
                 VisionBlocker.localScale = new Vector3(visionRag, visionRag, 1.0f);
-                VisionBlocker.GetComponent<Image>().color = new Color(0.0f, 0.0f, 0.0f, 1.0f - VisionStrength);
+                //VisionBlocker.GetComponent<Image>().color = new Color(0.0f, 0.0f, 0.0f, 1.0f - VisionStrength);
+                VisionBlocker.GetComponent<Image>().color = new Color(0.0f, 0.0f, 0.0f, 0.0f);
 
                 foreach (var senseType in StaticData.SenseTypesEnumerable)
                 {
