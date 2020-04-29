@@ -18,7 +18,8 @@ namespace theArch_LD46
         public Vector3 MoveLeft { private set; get; }
         public bool IsMoving { private set; get; }
 
-        public Dictionary<SenseType,float> PlayerSenseValues{ private set; get; }
+        public Dictionary<SenseType,float> PlayerSenseValues{ private set; get; }//现在整个数据结构都要改。
+        //public float VisionVal{ private set; get; }
 
         private float _speed = 18.0f;
         //private float _delVal = 0.1f;
@@ -36,6 +37,7 @@ namespace theArch_LD46
         private CharacterController _charCtrl;
         private AudioSource _pickUpSfx;
         private VisualEffect _playerMovingEffect;
+        public VisualEffect hitEffect;
 
         private string _comPosName = "CamPos";
         private string _playerMeshName = "PlayerMesh";
@@ -49,6 +51,8 @@ namespace theArch_LD46
 
         private Vector3 movingVec;
         private Camera MainCam;
+
+        public CameraJerk camJerk;
 
         //TODO 意外地相当相当靠谱，可以把材质的颜色再写一下，还有就是这个也到不能解决看到旁边的地形的问题，但是这个表现比UI的好太多了。
         public Transform curtainMesh;
@@ -105,6 +109,8 @@ namespace theArch_LD46
 
             BlurPlane?.gameObject.SetActive(true);
             curtainMesh?.gameObject.SetActive(false);
+
+            //camJerk = Camera.main.gameObject.GetComponent<CameraJerk>();
 
             ResetResetableData(this);
         }
@@ -252,11 +258,16 @@ namespace theArch_LD46
             if (other.gameObject.GetComponent<EnemyMono>())
             {
                 //撞一下后敌人必须死………………
+                Vector3 direction = other.transform.position - transform.position;
+                direction = direction.normalized * 0.3f;
                 EnemyMono enemy = other.gameObject.GetComponent<EnemyMono>();
                 if (!enemy.pendingDead)
                 {
                     PlayerHit = true;
                     PlayerSlowMo = true;
+                    camJerk.DoJerk(-direction);
+                    hitEffect.SetFloat("DamageAngle", Utils.GetSignedAngle(MoveForward, MoveLeft, direction));
+                    hitEffect.Play();
                 }
                 enemy?.HintByPlayer();
             }

@@ -87,7 +87,7 @@ namespace theArch_LD46
         public static float GetVisionCurtainRadius(float val)
         {
             //val = Mathf.Clamp01(val);
-            val = Mathf.Clamp01((val - ENEMY_HITTING_POWER) / 1 - ENEMY_HITTING_POWER);
+            val = Mathf.Clamp01((val - ENEMY_HITTING_POWER) / (1 - ENEMY_HITTING_POWER));
             return Mathf.Lerp(1.0f, 7.5f, val);
         }
 

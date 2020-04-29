@@ -18,6 +18,7 @@ namespace theArch_LD46
         public Transform meshRoot;
 
         public VisualEffect vf;
+        public GameObject DeadEffect;
 
         public bool pendingDead { private set; get; }
 
@@ -44,6 +45,8 @@ namespace theArch_LD46
         {
             if (pendingDead)
             {
+                GameObject go=Instantiate(DeadEffect, transform);
+                go.transform.parent = null;
                 gameMgr.SortedEnemies.Remove(this);
                 Destroy(gameObject);
             }

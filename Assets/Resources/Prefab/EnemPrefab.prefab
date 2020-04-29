@@ -132,6 +132,9 @@ MonoBehaviour:
   charCtrl: {fileID: 3955101142498974000}
   meshRoot: {fileID: 5609425841379655196}
   vf: {fileID: 3322759882570824965}
+  DeadEffect: {fileID: 4828036253782565685, guid: c6f29d9667e968246a599bf2b5bd8ce7,
+    type: 3}
+  gameMgr: {fileID: 0}
 --- !u!143 &3955101142498974000
 CharacterController:
   m_ObjectHideFlags: 0

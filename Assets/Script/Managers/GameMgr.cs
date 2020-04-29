@@ -17,15 +17,18 @@ namespace theArch_LD46
         public const string PlayerSpawnName = "PlayerSpawn";
         public const string EnemyRootName = "EnemyRoot";
         public const string PickUpRootName = "PickUpRoot";
+        public const string WallRootName = "WallRoot";
         public const string GoalName = "Goal";
 
         private Transform PlayerSpawn;
         private GameObject EnemyRoot;
         private GameObject PickUpRoot;
+        private GameObject WallRoot;
         public GameObject EnemyTemplate;
 
         public List<EnemyMono> SortedEnemies { set; get; }
         public List<PickUpMono> SortedPickUps { set; get; }
+        public Wallmono[] Walls { set; get; }
 
         public SenseDisplayingData senseDisplayingData { private set; get; }
         public float playerGoalAngle { private set; get; }
@@ -135,6 +138,8 @@ namespace theArch_LD46
                 pickup.gameMgr = this;
                 SortedPickUps.Add(pickup);
             }
+
+            Walls = WallRoot.GetComponentsInChildren<Wallmono>().ToArray();
         }
 
         void UpdateLevelReference()
@@ -152,6 +157,10 @@ namespace theArch_LD46
                 {
                     PickUpRoot = go;
                 }
+                else if (go.name == WallRootName)
+                {
+                    WallRoot = go;
+                }
             }
 
             foreach (var tran in trans)
@@ -166,6 +175,7 @@ namespace theArch_LD46
             Debug.Assert(EnemyRoot, "Can't Find Enemies");
             Debug.Assert(PickUpRoot, "Can't Find Pickups");
             Debug.Assert(PlayerSpawn, "Can't Find SpwanPt");
+            Debug.Assert(WallRoot, "Can't Find WallRoot");
         }
 
         void OnSceneUnLoaded(Scene scene)
@@ -251,7 +261,7 @@ namespace theArch_LD46
                         {
                             if (!timeMgr.slowMotion)
                             {
-                                timeMgr.TimeStretch(DesignerStaticData.SLOWMOTION_DURATION);
+                                //timeMgr.TimeStretch(DesignerStaticData.SLOWMOTION_DURATION);
                             }
 
                             player.PlayerSlowMo = false;

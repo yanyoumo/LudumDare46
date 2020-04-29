@@ -895,8 +895,8 @@ VisualEffectResource:
             serializedVersion: 2
             m_Curve:
             - serializedVersion: 3
-              time: -0.054164886
-              value: 0.31604004
+              time: 0.03529948
+              value: 0.1004846
               inSlope: 0
               outSlope: 0
               tangentMode: 0
@@ -950,7 +950,7 @@ VisualEffectResource:
       m_NamedObject:
         m_Array:
         - m_ExpressionIndex: 16
-          m_Value: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
+          m_Value: {fileID: 2800000, guid: 9cfcf0aad3a8c9f499ce0f1b02e2fe35, type: 3}
       m_Bool:
         m_Array: []
     m_ExposedExpressions:
@@ -1797,7 +1797,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"obj":{"fileID":10300,"guid":"0000000000000000f000000000000000","type":0}}'
+      m_SerializableObject: '{"obj":{"fileID":2800000,"guid":"9cfcf0aad3a8c9f499ce0f1b02e2fe35","type":3}}'
     m_Space: 2147483647
   m_Property:
     name: mainTexture
@@ -1906,7 +1906,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.AnimationCurve, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"frames":[{"time":-0.054164886474609378,"value":0.3160400390625,"inTangent":0.0,"outTangent":0.0,"tangentMode":0,"leftTangentMode":0,"rightTangentMode":0,"broken":false},{"time":0.9666748046875,"value":0.00235748291015625,"inTangent":0.0,"outTangent":0.0,"tangentMode":0,"leftTangentMode":0,"rightTangentMode":0,"broken":false}],"preWrapMode":8,"postWrapMode":8,"version":1}'
+      m_SerializableObject: '{"frames":[{"time":0.035299479961395267,"value":0.10048460215330124,"inTangent":0.0,"outTangent":0.0,"tangentMode":0,"leftTangentMode":0,"rightTangentMode":0,"broken":false},{"time":0.9666748046875,"value":0.00235748291015625,"inTangent":0.0,"outTangent":0.0,"tangentMode":0,"leftTangentMode":0,"rightTangentMode":0,"broken":false}],"preWrapMode":8,"postWrapMode":8,"version":1}'
     m_Space: 2147483647
   m_Property:
     name: Size
