@@ -29,12 +29,12 @@ namespace theArch_LD46
 
         private Vector3 EnemyOffset=new Vector3(0.0f,2.0f,0.0f);
 
-        public EnergyBar visionBar;
+        /*public EnergyBar visionBar;
         public EnergyBar hearingBar;
         public EnergyBar feelingBar;
-        public EnergyBar compassBar;
+        public EnergyBar compassBar;*/
 
-        private Dictionary<SenseType, EnergyBar> energyBars;
+        //private Dictionary<SenseType, EnergyBar> energyBars;
 
         public RectTransform GoalInd;
         public GameObject GameOverPanel;
@@ -79,17 +79,13 @@ namespace theArch_LD46
         void Start()
         {
             Debug.Log("UI invoked");
-            energyBars=new Dictionary<SenseType, EnergyBar>()
+            /*energyBars=new Dictionary<SenseType, EnergyBar>()
             {
                 { SenseType.Vision,visionBar},
                 { SenseType.Audio,hearingBar},
                 { SenseType.Compass,compassBar},
                 { SenseType.Feeling,feelingBar},
-            };
-            if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
-            {
-                InitUIForPlay();
-            }
+            };*/
         }
 
         public void InitUIForPlay()
@@ -100,9 +96,9 @@ namespace theArch_LD46
 
             GoalTrans.gameObject.SetActive(true);
             //VisionTransform.gameObject.SetActive(true);
-            DataTransform.gameObject.SetActive(true);
+            //DataTransform.gameObject.SetActive(true);
 
-            visionBar.SetBlockFrameColor(new[] { Color.gray });
+            /*visionBar.SetBlockFrameColor(new[] { Color.gray });
             hearingBar.SetBlockFrameColor(new[] { Color.gray });
             feelingBar.SetBlockFrameColor(new[] { Color.gray });
             compassBar.SetBlockFrameColor(new[] { Color.gray });
@@ -110,9 +106,16 @@ namespace theArch_LD46
             visionBar.SetBarFrameColor(Color.white);
             hearingBar.SetBarFrameColor(Color.white);
             feelingBar.SetBarFrameColor(Color.white);
-            compassBar.SetBarFrameColor(Color.white);
+            compassBar.SetBarFrameColor(Color.white);*/
 
             GameStartTransform.gameObject.SetActive(false);
+        }
+
+        public void InitUIForEnding()
+        {
+            //TODO 这个等UI整理完了再弄。
+            EnemyInds = null;
+            PickUpInds = null;
         }
 
         private Sprite getTexBySenseType(SenseType senseType)
@@ -154,16 +157,25 @@ namespace theArch_LD46
                 if (!gameMgr.levelSwitching)
                 {
                     //TODO 这里的Count外面应该处理掉。
-                    int feelingCount = gameMgr.FilteredSortedPickUpsData.Length;
+                    int hearingCount = 0;
+                    int feelingCount = 0;
+                    if (gameMgr.FilteredSortedEnemiesPos != null)
+                    {                     
+                        hearingCount = gameMgr.FilteredSortedEnemiesPos.Length;
+                    }
+                    if (gameMgr.FilteredSortedPickUpsData != null)
+                    {
+                        feelingCount = gameMgr.FilteredSortedPickUpsData.Length;
+                    }
+
                     float feelingAlpha = gameMgr.senseDisplayingData.FeelingAlpha;
-                    int hearingCount = gameMgr.FilteredSortedEnemiesPos.Length;
                     float hearingAlpha = gameMgr.senseDisplayingData.HearingAlpha;
                     float compassAlpha = gameMgr.senseDisplayingData.CompassAlpha;
 
                     ResizeAndEnableInds(hearingCount, ref EnemyInds, EnemyIndTemplate, transform);
                     ResizeAndEnableInds(feelingCount, ref PickUpInds, PickUpIndTemplate, transform);
 
-                    for (var i = 0; i < gameMgr.FilteredSortedEnemiesPos.Length; i++)
+                    for (var i = 0; i < hearingCount; i++)
                     {
                         EnemyInds[i].GetComponent<RectTransform>().position =
                             RectTransformUtility.WorldToScreenPoint(Camera.main,
@@ -171,7 +183,7 @@ namespace theArch_LD46
                         EnemyInds[i].GetComponent<Image>().color = new Color(1.0f, 0.0f, 0.0f, hearingAlpha);
                     }
 
-                    for (var i = 0; i < gameMgr.FilteredSortedPickUpsData.Length; i++)
+                    for (var i = 0; i < feelingCount; i++)
                     {
                         PickUpInds[i].GetComponent<RectTransform>().rotation =
                             Quaternion.Euler(0, 0, gameMgr.FilteredSortedPickUpsData[i].angle);
@@ -183,12 +195,12 @@ namespace theArch_LD46
                     GoalInd.rotation = Quaternion.Euler(0, 0, gameMgr.playerGoalAngle);
                     GoalInd.GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, compassAlpha);
 
-                    foreach (var senseType in StaticData.SenseTypesEnumerable)
+                    /*foreach (var senseType in StaticData.SenseTypesEnumerable)
                     {
                         energyBars.TryGetValue(senseType, out EnergyBar value);
                         System.Diagnostics.Debug.Assert(value != null, nameof(value) + " != null");
                         value.SetBlockFrameColor(GenColorsByVal(player.GetValBySenseType(senseType)));
-                    }
+                    }*/
                 }
             }else if (theArch_LD46_GameData.GameStatus == GameStatus.Ended)
             {

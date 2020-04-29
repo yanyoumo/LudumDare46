@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using theArch_LD46.GlobalHelper;
 using UnityEngine;
 
 namespace theArch_LD46
@@ -51,7 +53,11 @@ namespace theArch_LD46
     public static class DesignerStaticData
     {
 
+        public static readonly float ENEMY_HITTING_POWER = 0.2f;
+        public static readonly float SLOWMOTION_DURATION = 0.25f;
+        public static readonly float PLAYER_DIMINISHING_VAL = 0.1f;
         //这块儿每个不同的Sense都要被不同地解释，这个就没有特别好的辙。
+        private static readonly Dictionary<int, int> LevelFSM; 
 
         public static float GetCompassAlpha(float val)
         {
@@ -80,7 +86,8 @@ namespace theArch_LD46
 
         public static float GetVisionCurtainRadius(float val)
         {
-            val = Mathf.Clamp01(val);
+            //val = Mathf.Clamp01(val);
+            val = Mathf.Clamp01((val - ENEMY_HITTING_POWER) / 1 - ENEMY_HITTING_POWER);
             return Mathf.Lerp(1.0f, 7.5f, val);
         }
 
@@ -88,6 +95,15 @@ namespace theArch_LD46
         {
             visionVal = Mathf.Clamp01(visionVal);
             return 1 - visionVal;
+        }
+
+        static DesignerStaticData()
+        {
+            LevelFSM = new Dictionary<int, int>()
+            {
+                {StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV0, StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV1},
+                {StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV1, -1}
+            };
         }
 
         public static float GetSenseInitialVal(SenseType senseType)
@@ -99,12 +115,29 @@ namespace theArch_LD46
                 case SenseType.Audio:
                     return 0.0f;
                 case SenseType.Feeling:
-                    return 1.0f;
+                    return 0.0f;
                 case SenseType.Compass:
                     return 0.0f;
                 default:
                     return 0.0f;
             }
+        }
+
+        public static int GetNextLevel(int currentLevelID)
+        {
+            if (LevelFSM.TryGetValue(currentLevelID, out int res))
+            {
+                return res;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public static int GetStartingBG()
+        {
+            return StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV1;
         }
     }
 }

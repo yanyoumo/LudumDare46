@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace theArch_LD46
 {
-    public class MasterGameManager : MonoBehaviour
+    /*public class MasterGameManager : MonoBehaviour
     {
         // Start is called before the first frame update
         void Start()
@@ -22,5 +22,5 @@ namespace theArch_LD46
                 SceneManager.UnloadSceneAsync(StaticData.SCENE_ID_ADDITIVE_LV1);
             }
         }
-    }
+    }*/
 }

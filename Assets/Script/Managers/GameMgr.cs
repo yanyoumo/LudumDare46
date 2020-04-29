@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using theArchitectTechPack.GlobalHelper;
 using theArch_LD46.GlobalHelper;
@@ -23,7 +24,7 @@ namespace theArch_LD46
         private GameObject PickUpRoot;
         public GameObject EnemyTemplate;
 
-        private List<EnemyMono> SortedEnemies { set; get; }
+        public List<EnemyMono> SortedEnemies { set; get; }
         public List<PickUpMono> SortedPickUps { set; get; }
 
         public SenseDisplayingData senseDisplayingData { private set; get; }
@@ -45,11 +46,15 @@ namespace theArch_LD46
         private int CurrentLevelID;
         private int PendingLevelID;
 
+        private TimeMgr timeMgr;
+
         void Awake()
         {
-            theArch_LD46_GameData.GameStatus = GameStatus.Playing; //先强制跳过开始界面。
-            theArch_LD46_Time.Time = Time.timeSinceLevelLoad;
-            theArch_LD46_Time.delTime = Time.deltaTime;
+            if (timeMgr == null)
+            {
+                timeMgr=new TimeMgr();
+                timeMgr.ResetTime();
+            }
 
             SortedEnemies = new List<EnemyMono>();
             SortedPickUps = new List<PickUpMono>();
@@ -63,9 +68,7 @@ namespace theArch_LD46
 
         void Start()
         {
-            CurrentLevelID = StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV0;
-            PendingLevelID = StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV0;
-            loadPendingLevel();
+            StartGame();
         }
 
         private void UpdatePlayerSenseData()
@@ -81,6 +84,8 @@ namespace theArch_LD46
                 feelingAlpha, feelingCount, compassAlpha);
         }
 
+        #region SceneMgrRelated
+
         void ResetPlayer()
         {
             player.transform.position = PlayerSpawn.transform.position;
@@ -88,22 +93,15 @@ namespace theArch_LD46
             player.ResetResetableData(this);
         }
 
-        int GetNextLevel()
+        void UnloadLevelWAsyncLoadPending(int next)
         {
-            //TODO 类似FSM的机制切换关卡。
-            return StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV1;
-        }
-
-        void LoadNextLevel()
-        {
-            PendingLevelID = GetNextLevel();
+            PendingLevelID = next;
             UnLoadLevel();
         }
 
-        void ReloadCurrentLevel()
+        void ReloadLevel()
         {
-            PendingLevelID = CurrentLevelID;
-            UnLoadLevel();
+            UnloadLevelWAsyncLoadPending(CurrentLevelID);
         }
 
         private void UnLoadLevel()
@@ -112,7 +110,7 @@ namespace theArch_LD46
             SceneManager.UnloadSceneAsync(CurrentLevelID);
         }
 
-        void loadPendingLevel()
+        private void loadPendingLevel()
         {
             SceneManager.LoadScene(PendingLevelID, LoadSceneMode.Additive);
         }
@@ -127,6 +125,7 @@ namespace theArch_LD46
             EnemyMono[] enemiesMono = EnemyRoot.GetComponentsInChildren<EnemyMono>();
             foreach (var enemy in enemiesMono)
             {
+                enemy.gameMgr = this;
                 SortedEnemies.Add(enemy);
             }
 
@@ -177,13 +176,14 @@ namespace theArch_LD46
             }
         }
 
-        // called second
         void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+#if UNITY_EDITOR
             Debug.Log("OnSceneLoaded: " + scene.name);
             Debug.Log(mode);
+#endif
 
-            if (scene.name.ToLower().Contains("_level"))
+            if (scene.buildIndex== PendingLevelID)
             {
                 CurrentLevelID = PendingLevelID;
                 UpdateLevelReference();
@@ -191,51 +191,101 @@ namespace theArch_LD46
                 levelSwitching = false;
             }
         }
+        
+        void StartPlay()
+        {
+            theArch_LD46_GameData.GameStatus = GameStatus.Playing;
+            gamePlayUI.InitUIForPlay();
+            player.InitPlayingUI();
+            UnloadLevelWAsyncLoadPending(StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_LV0);
+        }
+
+        void StartGame()
+        {
+            levelSwitching = true;
+            theArch_LD46_GameData.GameStatus = GameStatus.Starting;
+            CurrentLevelID = DesignerStaticData.GetStartingBG();
+            PendingLevelID = DesignerStaticData.GetStartingBG();
+            timeMgr.ResetTime();
+            //gamePlayUI.InitUIForStarting();
+            loadPendingLevel();
+        }
+
+        void RestartGame()
+        {
+            levelSwitching = true;
+            theArch_LD46_GameData.GameStatus = GameStatus.Starting;
+            CurrentLevelID = DesignerStaticData.GetStartingBG();
+            PendingLevelID = DesignerStaticData.GetStartingBG();
+            timeMgr.ResetTime();
+            //gamePlayUI.InitUIForEnding();
+            UnloadLevelWAsyncLoadPending(CurrentLevelID);
+        }
+
+        #endregion
 
         void Update()
         {
-            theArch_LD46_Time.Time = Time.timeSinceLevelLoad;
-            theArch_LD46_Time.delTime = Time.deltaTime;
-
+            timeMgr.TimeUpdate();
 
             if (!levelSwitching)
             {
-                //Loading的逻辑会在loading中再跑了一圈儿，所以放进来。
-                if (player.PlayerDead)
+#if UNITY_EDITOR
+                if (Input.GetKeyDown(KeyCode.F3))
                 {
-                    ReloadCurrentLevel();
+                    //timeMgr.TimeStretch();
                 }
+#endif
+                switch (theArch_LD46_GameData.GameStatus)
+                {
+                    case GameStatus.Starting:
+                        //Waiting For Enter
+                        if (Input.GetButtonDown(StaticData.INPUT_BUTTON_NAME_GAME_START))
+                        {
+                            StartPlay();
+                        }
+                        break;
+                    case GameStatus.Playing:
+                        //Loading的逻辑会在loading中再跑了一圈儿，所以放进来。
+                        if (player.PlayerSlowMo)
+                        {
+                            if (!timeMgr.slowMotion)
+                            {
+                                timeMgr.TimeStretch(DesignerStaticData.SLOWMOTION_DURATION);
+                            }
 
-                if (player.Won)
-                {
-                    LoadNextLevel();
-                }
+                            player.PlayerSlowMo = false;
+                        }
 
-                //先不管，Additive的时候这些都要改。
-                /*if (theArch_LD46_GameData.GameStatus == GameStatus.Starting)
-                {
-                    if (dataReady)
-                    {
-                        dataReady = false;
-                    }
-                    if (Input.GetButtonDown(StaticData.INPUT_BUTTON_NAME_GAME_START))
-                    {
-                        theArch_LD46_GameData.GameStatus = GameStatus.Playing;
-                        SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
-                    }
+                        if (player.PlayerDead)
+                        {
+                            ReloadLevel();
+                        }
+
+                        if (player.Won)
+                        {
+                            //theArch_LD46_GameData.GameStatus = GameStatus.Ended;
+                            int nextLevel = DesignerStaticData.GetNextLevel(CurrentLevelID);
+                            if (nextLevel!=-1)
+                            {                               
+                                UnloadLevelWAsyncLoadPending(nextLevel);
+                            }
+                            else
+                            {
+                                theArch_LD46_GameData.GameStatus = GameStatus.Ended;
+                            }
+                        }
+                        break;
+                    case GameStatus.Ended:
+                        if (Input.GetButtonDown(StaticData.INPUT_BUTTON_NAME_GAME_START))
+                        {
+                            //TODO UI还没弄，就是等整个UI搞定后再写。
+                            RestartGame();
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-                if (theArch_LD46_GameData.GameStatus == GameStatus.Ended)
-                {
-                    if (dataReady)
-                    {
-                        dataReady = false;
-                    }
-                    if (Input.GetButtonDown(StaticData.INPUT_BUTTON_NAME_GAME_START))
-                    {
-                        theArch_LD46_GameData.GameStatus = GameStatus.Starting;
-                        SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
-                    }
-                }*/
             }
         }
 

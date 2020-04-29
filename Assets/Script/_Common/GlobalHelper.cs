@@ -22,7 +22,11 @@ namespace theArch_LD46
 
     public static class theArch_LD46_GameData
     {
-        public static GameStatus GameStatus = GameStatus.Playing;//先强制跳过去
+#if UNITY_EDITOR
+        public static GameStatus GameStatus = GameStatus.Starting;
+#else
+        public static GameStatus GameStatus = GameStatus.Starting;
+#endif
         //public static bool firstTimeGame = true;
     }
 
@@ -30,6 +34,7 @@ namespace theArch_LD46
     {      
         public static float Time;//In second.
         public static float delTime;//In second.
+        public static float UnscaleTime;//In second.
     }
 
 }

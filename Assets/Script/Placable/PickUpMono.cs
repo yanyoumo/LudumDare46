@@ -80,10 +80,12 @@ namespace theArch_LD46
                 Destroy(gameObject);
             }
 
+            float timeDel = theArch_LD46_Time.delTime * 100.0f;
+
             MeshRoot.position = OrgMeshRootPos +
                                 new Vector3(0.0f, 0.2f, 0.0f) * Mathf.Sin(theArch_LD46_Time.Time * 7.5f + CorePhase);
-            MeshRingA.transform.Rotate(RingAxisA, 8f);
-            MeshRingB.transform.Rotate(RingAxisB, 8f);
+            MeshRingA.transform.Rotate(RingAxisA, 8f * timeDel);
+            MeshRingB.transform.Rotate(RingAxisB, 8f * timeDel);
         }
     }
 }

@@ -12,24 +12,26 @@ namespace theArch_LD46
 {
     public class PlayerMono : PlaceableBase
     {
+        public GameMgr gameMgr;
 
         public Vector3 MoveForward { private set; get; }
         public Vector3 MoveLeft { private set; get; }
         public bool IsMoving { private set; get; }
-        //public bool Playing { private set; get; }
-        //public bool GameComplete { private set; get; }
 
         public Dictionary<SenseType,float> PlayerSenseValues{ private set; get; }
-        public bool PlayerDead{ set; get; }
 
-
-    private float _speed = 18.0f;
-        private float _delVal = 0.1f;
+        private float _speed = 18.0f;
+        //private float _delVal = 0.1f;
 
         public Transform Campos { private set; get; }
         public Transform MeshRoot { private set; get; }
-        public Transform BlurPlane { private set; get; }
+        public Transform BlurPlane;
+        public bool PlayerDead{ set; get; }
+        private bool PlayerHit = false;
+        public bool PlayerSlowMo{ set; get; }
         public bool Won { get; set; }
+
+        public VisionBar visionBar;
 
         private CharacterController _charCtrl;
         private AudioSource _pickUpSfx;
@@ -46,10 +48,9 @@ namespace theArch_LD46
         private readonly float _playerMovingEffectPropertyVal_MovingSpawnRate = 320.0f;
 
         private Vector3 movingVec;
-
         private Camera MainCam;
 
-        //TODO 意外地相当相当靠谱，可以把材质的颜色在写一下，还有就是这个也到不能解决看到旁边的地形的问题，但是这个表现比UI的好太多了。
+        //TODO 意外地相当相当靠谱，可以把材质的颜色再写一下，还有就是这个也到不能解决看到旁边的地形的问题，但是这个表现比UI的好太多了。
         public Transform curtainMesh;
 
         public void ResetResetableData(MonoBehaviour invoker)
@@ -67,8 +68,9 @@ namespace theArch_LD46
             }
 
             movingVec = Vector3.zero;
-            PlayerDead = false;
+            PlayerHit = false;
             Won = false;
+            PlayerDead = false;
         }
 
         void Awake()
@@ -101,18 +103,31 @@ namespace theArch_LD46
                 }
             }
 
+            BlurPlane?.gameObject.SetActive(true);
+            curtainMesh?.gameObject.SetActive(false);
+
             ResetResetableData(this);
+        }
+
+        public void InitPlayingUI()
+        {
+            Debug.Assert(theArch_LD46_GameData.GameStatus==GameStatus.Playing);
+            BlurPlane?.gameObject.SetActive(false);
+            curtainMesh?.gameObject.SetActive(true);
+        }
+
+
+        public void InitEndginingUI()
+        {
+            Debug.Assert(theArch_LD46_GameData.GameStatus == GameStatus.Ended);
+            BlurPlane?.gameObject.SetActive(true);
+            curtainMesh?.gameObject.SetActive(false);
         }
 
         // Start is called before the first frame update
         void Start()
         {
             MainCam = Camera.main;
-            BlurPlane?.gameObject.SetActive(true);
-            if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
-            {
-                BlurPlane?.gameObject.SetActive(false);
-            }
         }
 
         void UpdateBasicData()
@@ -138,7 +153,7 @@ namespace theArch_LD46
         void UpdateRotatingInput()
         {
             //TODO 这个也要优化，但是优先级不高了。
-            transform.Rotate(0, -Input.GetAxis(StaticData.INPUT_AXIS_NAME_LOOK_LEFT), 0);
+            transform.Rotate(0,-Input.GetAxis(StaticData.INPUT_AXIS_NAME_LOOK_LEFT) * 100.0f * theArch_LD46_Time.delTime, 0);
         }
 
         [Obsolete]
@@ -154,7 +169,17 @@ namespace theArch_LD46
             foreach (var senseType in StaticData.SenseTypesEnumerable)
             {
                 PlayerSenseValues.TryGetValue(senseType, out float val);
-                val -= _delVal * theArch_LD46_Time.delTime;
+                if (senseType == SenseType.Vision)
+                {
+                    if (val >= DesignerStaticData.ENEMY_HITTING_POWER)
+                    {
+                        val -= DesignerStaticData.PLAYER_DIMINISHING_VAL * theArch_LD46_Time.delTime;
+                    }
+                }
+                else
+                {                
+                    val -= DesignerStaticData.PLAYER_DIMINISHING_VAL * theArch_LD46_Time.delTime;
+                }
                 val = Mathf.Clamp01(val);
                 PlayerSenseValues[senseType] = val;
             }
@@ -176,9 +201,27 @@ namespace theArch_LD46
                 UpdateRotatingInput();
                 UpdateSenseVal();
 
-                //TODO 哦哦，变成这里了，还得想想怎么弄。
-                float curtainScale = Mathf.Lerp(1.0f, 7.5f, GetValBySenseType(SenseType.Vision));
-                curtainMesh.transform.localScale = new Vector3(curtainScale, 1.0f, curtainScale);
+                //TODO 一次PlayerHit但是要完成两件事儿，这个时序要注意！
+                //TODO 果然有问题。
+                if (PlayerHit)
+                {
+                    float visionval=GetValBySenseType(SenseType.Vision);
+                    visionval -= DesignerStaticData.ENEMY_HITTING_POWER;
+                    if (visionval<=0)
+                    {
+                        PlayerDead = true;
+                    }
+                    else
+                    {
+                        //TODO 这里是一个关键的设计点，就是玩家本来还有一次hit一上的血，但是被Hit一下后变成一次血线以下了。
+                        //TODO 这里怎么设计要再仔细考虑，现在事相当于多给了一发。就是再一次血线以上时，会卡在一次血线上。
+                        visionval = Mathf.Clamp(visionval, DesignerStaticData.ENEMY_HITTING_POWER - 0.005f, 1.0f);
+                        PlayerSenseValues[SenseType.Vision] = visionval;
+                        visionBar.HitEffect(visionval);
+                    }
+
+                    PlayerHit = false;
+                }
             }
         }
 
@@ -187,6 +230,11 @@ namespace theArch_LD46
             if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
             {
                 ActualMoving();
+
+                //TODO 哦哦，变成这里了，还得想想怎么弄。
+                float curtainScale = gameMgr.senseDisplayingData.VisionRadius;
+                curtainMesh.transform.localScale = new Vector3(curtainScale, 1.0f, curtainScale);
+
                 UpdateVisualEffect();
             }
         }
@@ -200,23 +248,29 @@ namespace theArch_LD46
 
         private void OnTriggerEnter(Collider other)
         {
+            //TODO 这里应该只弄flag，各种异步的事件去GameMgr里面去同步执行。
             if (other.gameObject.GetComponent<EnemyMono>())
             {
-                //SceneManager.LoadScene(StaticData.SCENE_ID_GAMEPLAY, LoadSceneMode.Single);
-                PlayerDead = true;
-                BlurPlane?.gameObject.SetActive(false);
+                //撞一下后敌人必须死………………
+                EnemyMono enemy = other.gameObject.GetComponent<EnemyMono>();
+                if (!enemy.pendingDead)
+                {
+                    PlayerHit = true;
+                    PlayerSlowMo = true;
+                }
+                enemy?.HintByPlayer();
             }
             else if (other.gameObject.GetComponent<GoalMono>())
             {
                 Won = true;
-                BlurPlane?.gameObject.SetActive(true);
-                //theArch_LD46_GameData.GameStatus = GameStatus.Ended;
             }
             else if (other.gameObject.GetComponent<PickUpMono>())
             {
                 _pickUpSfx.Play();
                 PickUpMono pickUpMono = other.gameObject.GetComponent<PickUpMono>();
-                //Debug.Log("Player got"+pickUpMono.senseType+"PickUp");
+#if UNITY_EDITOR
+                Debug.Log("Player got"+pickUpMono.senseType+"PickUp");
+#endif
                 PlayerSenseValues[pickUpMono.senseType] += pickUpMono.val;
                 pickUpMono.pendingDead = true;
             }

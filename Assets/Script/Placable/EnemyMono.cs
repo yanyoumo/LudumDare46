@@ -19,9 +19,18 @@ namespace theArch_LD46
 
         public VisualEffect vf;
 
+        public bool pendingDead { private set; get; }
+
+        public GameMgr gameMgr;
+
         public void SetPosition(Vector3 pos)
         {
             gameObject.transform.position = pos;
+        }
+
+        public void HintByPlayer()
+        {
+            pendingDead = true;
         }
 
         // Start is called before the first frame update
@@ -33,11 +42,17 @@ namespace theArch_LD46
         // Update is called once per frame
         void Update()
         {
+            if (pendingDead)
+            {
+                gameMgr.SortedEnemies.Remove(this);
+                Destroy(gameObject);
+            }
+
             Vector3 forward;
             forward = XAxisPatrolOrZ ? new Vector3(1.0f,0.0f,0.0f) : new Vector3(0.0f, 0.0f, 1.0f);
-            charCtrl.Move(forward * (GoForward ? 1.0f : -1.0f) * speed);
-
-            meshRoot.transform.Rotate(0, GoForward ? 1.5f : -1.5f, 0);
+            float delTime = theArch_LD46_Time.delTime * 100.0f;
+            charCtrl.Move(forward * (GoForward ? 1.0f : -1.0f) * speed * delTime);
+            meshRoot.transform.Rotate(0, GoForward ? 1.5f : -1.5f * delTime, 0);
 
             vf.SetVector3("EnemyPos",transform.position);
         }
