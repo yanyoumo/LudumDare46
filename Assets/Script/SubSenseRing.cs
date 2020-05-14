@@ -7,7 +7,7 @@ namespace theArch_LD46
 {
     public class SubSenseRing : MonoBehaviour
     {
-        public SenseType senseType;
+        public BasicSenseType BasicSenseType;
         public float val;
 
         public MeshRenderer coreRenderer;
@@ -18,26 +18,26 @@ namespace theArch_LD46
         public Texture2D senseFeelingTexture;
         public Texture2D senseCompassTexture;
 
-        private Texture2D getTexBySenseType(SenseType senseType)
+        private Texture2D getTexBySenseType(BasicSenseType basicSenseType)
         {
-            switch (senseType)
+            switch (basicSenseType)
             {
-                case SenseType.Vision:
+                case BasicSenseType.Vision:
                     return senseVisionTexture;
-                case SenseType.Audio:
+                case BasicSenseType.Audio:
                     return senseAudioTexture;
-                case SenseType.Feeling:
+                case BasicSenseType.Feeling:
                     return senseFeelingTexture;
-                case SenseType.Compass:
+                case BasicSenseType.Compass:
                     return senseCompassTexture;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(senseType), senseType, null);
+                    throw new ArgumentOutOfRangeException(nameof(basicSenseType), basicSenseType, null);
             }
         }
 
         public void RefreshIcon()
         {
-            coreRenderer.material.SetTexture("_UnlitColorMap", getTexBySenseType(senseType));
+            coreRenderer.material.SetTexture("_UnlitColorMap", getTexBySenseType(BasicSenseType));
         }
 
         // Start is called before the first frame update
@@ -51,6 +51,7 @@ namespace theArch_LD46
         {
             val = Mathf.Clamp(1-val, 0.001f, 0.999f);
             ringRenderer.material.SetFloat("_AlphaCutoff", val);
+            ringRenderer.material.SetColor("_UnlitColor", Color.Lerp(Color.green, Color.red, val));
         }
     }
 }

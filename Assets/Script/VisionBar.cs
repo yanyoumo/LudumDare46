@@ -16,7 +16,7 @@ namespace theArch_LD46
         public VisionValBar visionValBar;
         public Transform visionThBar;
 
-        private Queue<SenseType> senseQueue;
+        private Queue<BasicSenseType> senseQueue;
 
         public SubSenseRing subSenseRingA;
         public SubSenseRing subSenseRingB;
@@ -29,7 +29,7 @@ namespace theArch_LD46
         // Start is called before the first frame update
         void Start()
         {
-            senseQueue = new Queue<SenseType>();
+            senseQueue = new Queue<BasicSenseType>();
             playerVisionEnemyTh = DesignerStaticData.ENEMY_HITTING_POWER;
             subRingArray = new[] {subSenseRingA, subSenseRingB, subSenseRingC};
         }
@@ -52,9 +52,9 @@ namespace theArch_LD46
                 playerVisionEnemyTh = Mathf.Clamp01(playerVisionEnemyTh);
                 visionThBar.transform.localPosition = new Vector3(playerVisionEnemyTh * -3.4f, 0.0f, 0.0f);
 
-                visionValBar.val = player.GetValBySenseType(SenseType.Vision);
+                visionValBar.val = player.GetValBySenseType(BasicSenseType.Vision);
 
-                Queue<SenseType> oldQueue = senseQueue;
+                Queue<BasicSenseType> oldQueue = senseQueue;
 
                 if (senseQueue.Count > 0)
                 {
@@ -69,7 +69,7 @@ namespace theArch_LD46
 
                 foreach (var senseType in StaticData.SenseTypesEnumerable)
                 {
-                    if (senseType != SenseType.Vision)
+                    if (senseType != BasicSenseType.Vision)
                     {
                         if (ValAboveTH(player.GetValBySenseType(senseType)))
                         {
@@ -91,7 +91,7 @@ namespace theArch_LD46
                         if (i < senseQueue.Count)
                         {
                             subRingArray[i].gameObject.SetActive(true);
-                            subRingArray[i].senseType = senseQueue.ToArray()[i];
+                            subRingArray[i].BasicSenseType = senseQueue.ToArray()[i];
                             subRingArray[i].val = player.GetValBySenseType(senseQueue.ToArray()[i]);
                             subRingArray[i].RefreshIcon();
                         }

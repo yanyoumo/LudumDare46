@@ -29,13 +29,6 @@ namespace theArch_LD46
 
         private Vector3 EnemyOffset=new Vector3(0.0f,2.0f,0.0f);
 
-        /*public EnergyBar visionBar;
-        public EnergyBar hearingBar;
-        public EnergyBar feelingBar;
-        public EnergyBar compassBar;*/
-
-        //private Dictionary<SenseType, EnergyBar> energyBars;
-
         public RectTransform GoalInd;
         public GameObject GameOverPanel;
 
@@ -79,13 +72,13 @@ namespace theArch_LD46
         void Start()
         {
             Debug.Log("UI invoked");
-            /*energyBars=new Dictionary<SenseType, EnergyBar>()
-            {
-                { SenseType.Vision,visionBar},
-                { SenseType.Audio,hearingBar},
-                { SenseType.Compass,compassBar},
-                { SenseType.Feeling,feelingBar},
-            };*/
+        }
+
+        public void InitUIForRestart()
+        {
+            GameOverPanel.gameObject.SetActive(false);
+            GoalTrans.gameObject.SetActive(false);
+            GameStartTransform.gameObject.SetActive(true);
         }
 
         public void InitUIForPlay()
@@ -95,19 +88,6 @@ namespace theArch_LD46
             PickUpInds = new List<GameObject>();
 
             GoalTrans.gameObject.SetActive(true);
-            //VisionTransform.gameObject.SetActive(true);
-            //DataTransform.gameObject.SetActive(true);
-
-            /*visionBar.SetBlockFrameColor(new[] { Color.gray });
-            hearingBar.SetBlockFrameColor(new[] { Color.gray });
-            feelingBar.SetBlockFrameColor(new[] { Color.gray });
-            compassBar.SetBlockFrameColor(new[] { Color.gray });
-
-            visionBar.SetBarFrameColor(Color.white);
-            hearingBar.SetBarFrameColor(Color.white);
-            feelingBar.SetBarFrameColor(Color.white);
-            compassBar.SetBarFrameColor(Color.white);*/
-
             GameStartTransform.gameObject.SetActive(false);
         }
 
@@ -118,20 +98,20 @@ namespace theArch_LD46
             PickUpInds = null;
         }
 
-        private Sprite getTexBySenseType(SenseType senseType)
+        private Sprite getTexBySenseType(BasicSenseType basicSenseType)
         {
-            switch (senseType)
+            switch (basicSenseType)
             {
-                case SenseType.Vision:
+                case BasicSenseType.Vision:
                     return senseVisionTexture;
-                case SenseType.Audio:
+                case BasicSenseType.Audio:
                     return senseAudioTexture;
-                case SenseType.Feeling:
+                case BasicSenseType.Feeling:
                     return senseFeelingTexture;
-                case SenseType.Compass:
+                case BasicSenseType.Compass:
                     return senseCompassTexture;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(senseType), senseType, null);
+                    throw new ArgumentOutOfRangeException(nameof(basicSenseType), basicSenseType, null);
             }
         }
 
@@ -188,28 +168,18 @@ namespace theArch_LD46
                         PickUpInds[i].GetComponent<RectTransform>().rotation =
                             Quaternion.Euler(0, 0, gameMgr.FilteredSortedPickUpsData[i].angle);
                         PickUpInds[i].GetComponentsInChildren<Image>()[1].sprite =
-                            getTexBySenseType(gameMgr.FilteredSortedPickUpsData[i].senseType);
+                            getTexBySenseType(gameMgr.FilteredSortedPickUpsData[i].BasicSenseType);
                     }
 
                     //Vector3 dirGoal = GoalTransform.position - player.transform.position;
                     GoalInd.rotation = Quaternion.Euler(0, 0, gameMgr.playerGoalAngle);
                     GoalInd.GetComponent<Image>().color = new Color(1.0f, 1.0f, 1.0f, compassAlpha);
-
-                    /*foreach (var senseType in StaticData.SenseTypesEnumerable)
-                    {
-                        energyBars.TryGetValue(senseType, out EnergyBar value);
-                        System.Diagnostics.Debug.Assert(value != null, nameof(value) + " != null");
-                        value.SetBlockFrameColor(GenColorsByVal(player.GetValBySenseType(senseType)));
-                    }*/
                 }
             }else if (theArch_LD46_GameData.GameStatus == GameStatus.Ended)
             {
                 for (int i = 0; i < this.transform.childCount; i++)
                 {
-                    if (i != 3)//TODO 这个就很搓
-                    {
-                        transform.GetChild(i).gameObject.SetActive(false);
-                    }
+                    transform.GetChild(i).gameObject.SetActive(false);
                 }
                 GameOverPanel.gameObject.SetActive(true);
             }

@@ -18,8 +18,8 @@ namespace theArch_LD46
         public Vector3 MoveLeft { private set; get; }
         public bool IsMoving { private set; get; }
 
-        public Dictionary<SenseType,float> PlayerSenseValues{ private set; get; }//现在整个数据结构都要改。
-        //public float VisionVal{ private set; get; }
+        public Dictionary<BasicSenseType,float> PlayerSenseValues{ private set; get; }//现在整个数据结构都要改。
+        public Dictionary<SuperSenseType,float> PlayerSuperSenseValues{ private set; get; }
 
         private float _speed = 18.0f;
         //private float _delVal = 0.1f;
@@ -36,6 +36,7 @@ namespace theArch_LD46
 
         private CharacterController _charCtrl;
         private AudioSource _pickUpSfx;
+        public AudioSource _hitSfx;
         private VisualEffect _playerMovingEffect;
         public VisualEffect hitEffect;
 
@@ -63,12 +64,17 @@ namespace theArch_LD46
             MoveForward = Vector3.Normalize(new Vector3(Camera.main.transform.forward.x, 0.0f, Camera.main.transform.forward.z));
             MoveLeft = Vector3.Cross(MoveForward, Vector3.up);
 
-            PlayerSenseValues = new Dictionary<SenseType, float>();
-
+            PlayerSenseValues = new Dictionary<BasicSenseType, float>();
+            PlayerSuperSenseValues=new Dictionary<SuperSenseType, float>();
 
             foreach (var senseType in StaticData.SenseTypesEnumerable)
             {
                 PlayerSenseValues.Add(senseType, DesignerStaticData.GetSenseInitialVal(senseType));
+            }
+
+            foreach (var superSenseType in StaticData.SuperSenseTypesEnumerable)
+            {
+                PlayerSuperSenseValues.Add(superSenseType, 0.0f);
             }
 
             movingVec = Vector3.zero;
@@ -175,17 +181,36 @@ namespace theArch_LD46
             foreach (var senseType in StaticData.SenseTypesEnumerable)
             {
                 PlayerSenseValues.TryGetValue(senseType, out float val);
-                if (senseType == SenseType.Vision)
+                if (senseType == BasicSenseType.Vision)
                 {
                     if (val >= DesignerStaticData.ENEMY_HITTING_POWER)
                     {
-                        val -= DesignerStaticData.PLAYER_DIMINISHING_VAL * theArch_LD46_Time.delTime;
+                        val -= DesignerStaticData.PLAYER_VISION_DIMINISHING_VAL * theArch_LD46_Time.delTime;
                     }
                 }
                 else
-                {                
-                    val -= DesignerStaticData.PLAYER_DIMINISHING_VAL * theArch_LD46_Time.delTime;
+                {
+                    SuperSenseType superSenseType = DesignerStaticData.GetSuperVersionOfSense(senseType);
+                    PlayerSuperSenseValues.TryGetValue(superSenseType, out float superVal);
+                    if (superVal > 0)
+                    {
+                        //会不会有浮点error什么的？
+                        superVal -= DesignerStaticData.PLAYER_SUPER_DIMINISHING_VAL * theArch_LD46_Time.delTime;
+                        if (superVal <= 0)
+                        {
+                            superVal = 0;
+                            val = 0;
+                        }
+
+                        PlayerSuperSenseValues[superSenseType] = superVal;
+                    }
+                    else
+                    {
+                        val -= DesignerStaticData.PLAYER_BASIC_DIMINISHING_VAL * theArch_LD46_Time.delTime;
+                    }
+
                 }
+
                 val = Mathf.Clamp01(val);
                 PlayerSenseValues[senseType] = val;
             }
@@ -202,32 +227,39 @@ namespace theArch_LD46
         {
             if (theArch_LD46_GameData.GameStatus == GameStatus.Playing)
             {
-                UpdateBasicData();
-                UpdateMovingInput();
-                UpdateRotatingInput();
-                UpdateSenseVal();
-
-                //TODO 一次PlayerHit但是要完成两件事儿，这个时序要注意！
-                //TODO 果然有问题。
-                if (PlayerHit)
+                if (!gameMgr.levelSwitching)
                 {
-                    float visionval=GetValBySenseType(SenseType.Vision);
-                    visionval -= DesignerStaticData.ENEMY_HITTING_POWER;
-                    if (visionval<=0)
-                    {
-                        PlayerDead = true;
-                    }
-                    else
-                    {
-                        //TODO 这里是一个关键的设计点，就是玩家本来还有一次hit一上的血，但是被Hit一下后变成一次血线以下了。
-                        //TODO 这里怎么设计要再仔细考虑，现在事相当于多给了一发。就是再一次血线以上时，会卡在一次血线上。
-                        visionval = Mathf.Clamp(visionval, DesignerStaticData.ENEMY_HITTING_POWER - 0.005f, 1.0f);
-                        PlayerSenseValues[SenseType.Vision] = visionval;
-                        visionBar.HitEffect(visionval);
-                    }
+                    UpdateBasicData();
+                    UpdateMovingInput();
+                    UpdateRotatingInput();
+                    UpdateSenseVal();
 
-                    PlayerHit = false;
+                    //TODO 一次PlayerHit但是要完成两件事儿，这个时序要注意！
+                    //TODO 果然有问题。
+                    if (PlayerHit)
+                    {
+                        float visionval = GetValBySenseType(BasicSenseType.Vision);
+                        visionval -= DesignerStaticData.ENEMY_HITTING_POWER;
+                        if (visionval <= 0)
+                        {
+                            PlayerDead = true;
+                        }
+                        else
+                        {
+                            //TODO 这里是一个关键的设计点，就是玩家本来还有一次hit一上的血，但是被Hit一下后变成一次血线以下了。
+                            //TODO 这里怎么设计要再仔细考虑，现在事相当于多给了一发。就是再一次血线以上时，会卡在一次血线上。
+                            visionval = Mathf.Clamp(visionval, DesignerStaticData.ENEMY_HITTING_POWER - 0.005f, 1.0f);
+                            PlayerSenseValues[BasicSenseType.Vision] = visionval;
+                            visionBar.HitEffect(visionval);
+                        }
+
+                        PlayerHit = false;
+                    }
                 }
+            }
+            else if (theArch_LD46_GameData.GameStatus == GameStatus.Ended)
+            {
+                InitEndginingUI();
             }
         }
 
@@ -245,45 +277,73 @@ namespace theArch_LD46
             }
         }
 
-        public float GetValBySenseType(SenseType senseType)
+        public float GetValBySenseType(BasicSenseType basicSenseType)
         {
             float val = 0.0f;
-            PlayerSenseValues.TryGetValue(senseType, out val);
+            PlayerSenseValues.TryGetValue(basicSenseType, out val);
             return val;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            //TODO 这里应该只弄flag，各种异步的事件去GameMgr里面去同步执行。
-            if (other.gameObject.GetComponent<EnemyMono>())
+            if (!gameMgr.levelSwitching)
             {
-                //撞一下后敌人必须死………………
-                Vector3 direction = other.transform.position - transform.position;
-                direction = direction.normalized * 0.3f;
-                EnemyMono enemy = other.gameObject.GetComponent<EnemyMono>();
-                if (!enemy.pendingDead)
+                //TODO 这里应该只弄flag，各种异步的事件去GameMgr里面去同步执行。
+                if (other.gameObject.GetComponent<EnemyMono>())
                 {
-                    PlayerHit = true;
-                    PlayerSlowMo = true;
-                    camJerk.DoJerk(-direction);
-                    hitEffect.SetFloat("DamageAngle", Utils.GetSignedAngle(MoveForward, MoveLeft, direction));
-                    hitEffect.Play();
+                    //撞一下后敌人必须死………………
+                    Vector3 direction = other.transform.position - transform.position;
+                    if (direction.magnitude>=5)
+                    {
+                        //不是很懂，切环境的时候，这个会被强制调一遍。即使距离八竿子远。
+                        return;
+                    }
+                    direction = direction.normalized * 0.3f;
+                    EnemyMono enemy = other.gameObject.GetComponent<EnemyMono>();
+                    if (!enemy.pendingDead)
+                    {
+                        PlayerHit = true;
+                        PlayerSlowMo = true;
+                        camJerk.DoJerk(-direction);
+                        hitEffect.SetFloat("DamageAngle", Utils.GetSignedAngle(MoveForward, MoveLeft, direction));
+                        hitEffect.Play();
+                        _hitSfx.Play();
+                    }
+
+                    enemy?.HintByPlayer();
                 }
-                enemy?.HintByPlayer();
-            }
-            else if (other.gameObject.GetComponent<GoalMono>())
-            {
-                Won = true;
-            }
-            else if (other.gameObject.GetComponent<PickUpMono>())
-            {
-                _pickUpSfx.Play();
-                PickUpMono pickUpMono = other.gameObject.GetComponent<PickUpMono>();
+                else if (other.gameObject.GetComponent<GoalMono>())
+                {
+                    Won = true;
+                }
+                else if (other.gameObject.GetComponent<PickUpMono>())
+                {
+                    _pickUpSfx.Play();
+                    PickUpMono pickUpMono = other.gameObject.GetComponent<PickUpMono>();
 #if UNITY_EDITOR
-                Debug.Log("Player got"+pickUpMono.senseType+"PickUp");
+                    //Debug.Log("Player got"+pickUpMono.basicSenseType+"PickUp");
 #endif
-                PlayerSenseValues[pickUpMono.senseType] += pickUpMono.val;
-                pickUpMono.pendingDead = true;
+                    BasicSenseType pickUpType = pickUpMono.BasicSenseType;
+                    float newVal = PlayerSenseValues[pickUpType] + pickUpMono.val;
+                    if (pickUpType != BasicSenseType.Vision)
+                    {
+                        if (newVal > 1.0f)
+                        {
+                            //TODO 这里设计在Super状态后，再吃到一个pick怎么办。目前的解决方案是Super之后再吃一个会被充满。
+                            //也不是不行。就是Super的事件应该巨短。
+                            newVal = 1.0f;
+                            //Super状态先去掉。
+                            //PlayerSuperSenseValues[DesignerStaticData.GetSuperVersionOfSense(pickUpMono.BasicSenseType)] = 1.0f;
+                        }
+                    }
+                    else
+                    {
+                        newVal = PlayerSenseValues[BasicSenseType.Vision] + DesignerStaticData.VISION_PICKUP_VAL;
+                    }
+
+                    PlayerSenseValues[pickUpMono.BasicSenseType] = newVal;
+                    pickUpMono.pendingDead = true;
+                }
             }
         }
     }

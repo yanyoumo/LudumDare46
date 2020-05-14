@@ -76,13 +76,13 @@ namespace theArch_LD46
 
         private void UpdatePlayerSenseData()
         {
-            float curtainAlpha = DesignerStaticData.GetVisionCurtainAlpha(player.GetValBySenseType(SenseType.Vision));
-            float curtainRadius = DesignerStaticData.GetVisionCurtainRadius(player.GetValBySenseType(SenseType.Vision));
-            int hearingCount = DesignerStaticData.GetHearingCount(player.GetValBySenseType(SenseType.Audio));
-            float hearingAlpha = DesignerStaticData.GetHearingAlpha(player.GetValBySenseType(SenseType.Audio));
-            int feelingCount = DesignerStaticData.GetFeelingCount(player.GetValBySenseType(SenseType.Feeling));
-            float feelingAlpha = DesignerStaticData.GetFeelingAlpha(player.GetValBySenseType(SenseType.Feeling));
-            float compassAlpha = DesignerStaticData.GetCompassAlpha(player.GetValBySenseType(SenseType.Compass));
+            float curtainAlpha = DesignerStaticData.GetVisionCurtainAlpha(player.GetValBySenseType(BasicSenseType.Vision));
+            float curtainRadius = DesignerStaticData.GetVisionCurtainRadius(player.GetValBySenseType(BasicSenseType.Vision));
+            int hearingCount = DesignerStaticData.GetHearingCount(player.GetValBySenseType(BasicSenseType.Audio));
+            float hearingAlpha = DesignerStaticData.GetHearingAlpha(player.GetValBySenseType(BasicSenseType.Audio));
+            int feelingCount = DesignerStaticData.GetFeelingCount(player.GetValBySenseType(BasicSenseType.Feeling));
+            float feelingAlpha = DesignerStaticData.GetFeelingAlpha(player.GetValBySenseType(BasicSenseType.Feeling));
+            float compassAlpha = DesignerStaticData.GetCompassAlpha(player.GetValBySenseType(BasicSenseType.Compass));
             senseDisplayingData = new SenseDisplayingData(curtainAlpha, curtainRadius, hearingAlpha, hearingCount,
                 feelingAlpha, feelingCount, compassAlpha);
         }
@@ -125,21 +125,23 @@ namespace theArch_LD46
             SortedEnemies = new List<EnemyMono>();
             SortedPickUps = new List<PickUpMono>();
 
-            EnemyMono[] enemiesMono = EnemyRoot.GetComponentsInChildren<EnemyMono>();
+            EnemyMono[] enemiesMono = FindObjectsOfType<EnemyMono>();
             foreach (var enemy in enemiesMono)
             {
                 enemy.gameMgr = this;
                 SortedEnemies.Add(enemy);
             }
 
-            PickUpMono[] pickUps = PickUpRoot.GetComponentsInChildren<PickUpMono>();
+            // 这里使用GetComponentsInChildren和sceneLoaded一起用时序似乎有问题。
+            // 在这种loading时，还是都用FindObjectsOfType吧。
+            PickUpMono[] pickUps = FindObjectsOfType<PickUpMono>();
             foreach (var pickup in pickUps)
             {
                 pickup.gameMgr = this;
                 SortedPickUps.Add(pickup);
             }
 
-            Walls = WallRoot.GetComponentsInChildren<Wallmono>().ToArray();
+            Walls = FindObjectsOfType<Wallmono>().ToArray();
         }
 
         void UpdateLevelReference()
@@ -193,12 +195,15 @@ namespace theArch_LD46
             Debug.Log(mode);
 #endif
 
-            if (scene.buildIndex== PendingLevelID)
+            if (scene.buildIndex == PendingLevelID)
             {
-                CurrentLevelID = PendingLevelID;
-                UpdateLevelReference();
-                UpdateLevelContents();
-                levelSwitching = false;
+                if (scene.buildIndex != StaticData.SCENE_ID_GAMEPLAY_ADDITIVE_CORE)
+                {
+                    CurrentLevelID = PendingLevelID;
+                    UpdateLevelReference();
+                    UpdateLevelContents();
+                    levelSwitching = false;
+                }
             }
         }
         
@@ -289,8 +294,8 @@ namespace theArch_LD46
                     case GameStatus.Ended:
                         if (Input.GetButtonDown(StaticData.INPUT_BUTTON_NAME_GAME_START))
                         {
-                            //TODO UI还没弄，就是等整个UI搞定后再写。
                             RestartGame();
+                            gamePlayUI.InitUIForRestart();
                         }
                         break;
                     default:
@@ -330,7 +335,7 @@ namespace theArch_LD46
                     {
                         Vector3 pickDir = FilteredSortedPickUps[i].transform.position - player.transform.position;
                         float angle = Utils.GetSignedAngle(player.MoveForward, player.MoveLeft, pickDir);
-                        FilteredSortedPickUpsData[i] = new HearingSenseData(FilteredSortedPickUps[i].senseType, angle);
+                        FilteredSortedPickUpsData[i] = new HearingSenseData(FilteredSortedPickUps[i].BasicSenseType, angle);
                     }
 
                     Vector3 dirGoal = GoalTransform.transform.position - player.transform.position;

@@ -2,13 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = System.Random;
 
 namespace theArch_LD46
 {
     public class PickUpMono : PlaceableBase
     {
-        public SenseType senseType; // { private set; get; }
+        public BasicSenseType BasicSenseType; // { private set; get; }
 
         public float val { private set; get; }
 
@@ -36,20 +35,20 @@ namespace theArch_LD46
         public void InitPickUp()
         {
             pendingDead = false;
-            val = 0.4f;
+            val = DesignerStaticData.SINGLE_PICKUP_VAL;
             Texture2D targetTex;
-            switch (senseType)
+            switch (BasicSenseType)
             {
-                case SenseType.Vision:
+                case BasicSenseType.Vision:
                     targetTex = senseVisionTexture;
                     break;
-                case SenseType.Audio:
+                case BasicSenseType.Audio:
                     targetTex = senseAudioTexture;
                     break;
-                case SenseType.Feeling:
+                case BasicSenseType.Feeling:
                     targetTex = senseFeelingTexture;
                     break;
-                case SenseType.Compass:
+                case BasicSenseType.Compass:
                     targetTex = senseCompassTexture;
                     break;
                 default:
@@ -76,7 +75,8 @@ namespace theArch_LD46
         {
             if (pendingDead)
             {
-                gameMgr.SortedPickUps.Remove(this);
+                Debug.Assert(gameMgr);
+                gameMgr.SortedPickUps.Remove(this);//在build里面GameMgr的引用掉了？？？对，参考GameMgr约135行代码
                 Destroy(gameObject);
             }
 

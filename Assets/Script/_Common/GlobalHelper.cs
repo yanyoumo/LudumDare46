@@ -5,12 +5,20 @@ using theArchitectTechPack.GlobalHelper;
 
 namespace theArch_LD46
 {
-    public enum SenseType
+    public enum BasicSenseType
     {
+        //操，在这儿咬我一口……
         Vision,
         Audio,
         Feeling,
         Compass,
+    }
+
+    public enum SuperSenseType
+    {
+        SuperAudio,
+        SuperFeeling,
+        SuperCompass,
     }
 
     public enum GameStatus
@@ -43,7 +51,8 @@ namespace theArch_LD46.GlobalHelper
 {
     public static partial class StaticData
     {
-        public static IEnumerable<SenseType> SenseTypesEnumerable;
+        public static IEnumerable<BasicSenseType> SenseTypesEnumerable;
+        public static IEnumerable<SuperSenseType> SuperSenseTypesEnumerable;
         //
         public static readonly string INPUT_AXIS_NAME_FORWARD = "MoveForward";
         public static readonly string INPUT_AXIS_NAME_LEFT = "MoveLeft";
@@ -51,17 +60,18 @@ namespace theArch_LD46.GlobalHelper
 
         public static readonly string INPUT_BUTTON_NAME_GAME_START = "GameStart";
 
-        public static readonly int SCENE_ID_GAMEPLAY = 0;
+        /*public static readonly int SCENE_ID_GAMEPLAY = 0;
         public static readonly int SCENE_ID_ADDITIVE_CORE = 1;
-        public static readonly int SCENE_ID_ADDITIVE_LV1 = 2;
+        public static readonly int SCENE_ID_ADDITIVE_LV1 = 2;*/
 
-        public static readonly int SCENE_ID_GAMEPLAY_ADDITIVE_CORE = 3;
-        public static readonly int SCENE_ID_GAMEPLAY_ADDITIVE_LV0 = 4;
-        public static readonly int SCENE_ID_GAMEPLAY_ADDITIVE_LV1 = 5;
+        public static readonly int SCENE_ID_GAMEPLAY_ADDITIVE_CORE = 0;
+        public static readonly int SCENE_ID_GAMEPLAY_ADDITIVE_LV0 = 1;
+        public static readonly int SCENE_ID_GAMEPLAY_ADDITIVE_LV1 = 2;
 
         static StaticData()
         {
-            SenseTypesEnumerable = Utils.GetEnumValuesAsArray<SenseType>();
+            SenseTypesEnumerable = Utils.GetEnumValuesAsArray<BasicSenseType>();
+            SuperSenseTypesEnumerable = Utils.GetEnumValuesAsArray<SuperSenseType>();
         }
     }
 }

@@ -8,12 +8,12 @@ namespace theArch_LD46
 {
     public struct HearingSenseData
     {
-        public SenseType senseType { get; }
+        public BasicSenseType BasicSenseType { get; }
         public float angle { get; }
 
-        public HearingSenseData(SenseType _senseType,float _angle)
+        public HearingSenseData(BasicSenseType basicSenseType,float _angle)
         {
-            senseType = _senseType;
+            BasicSenseType = basicSenseType;
             angle = _angle;
         }
     }
@@ -52,10 +52,14 @@ namespace theArch_LD46
 
     public static class DesignerStaticData
     {
-
-        public static readonly float ENEMY_HITTING_POWER = 0.2f;
+        //把HittingPower提高了，相当于需要更加重视敌人了。也就是听觉掉落物的意义被提高了。       
+        public static readonly float ENEMY_HITTING_POWER = 0.35f;
+        public static readonly float VISION_PICKUP_VAL = 0.3f;
+        public static readonly float SINGLE_PICKUP_VAL = 1.0f;
         public static readonly float SLOWMOTION_DURATION = 0.25f;
-        public static readonly float PLAYER_DIMINISHING_VAL = 0.1f;
+        public static readonly float PLAYER_VISION_DIMINISHING_VAL = 0.075f;
+        public static readonly float PLAYER_BASIC_DIMINISHING_VAL = 0.175f;
+        public static readonly float PLAYER_SUPER_DIMINISHING_VAL = 0.3f;
         //这块儿每个不同的Sense都要被不同地解释，这个就没有特别好的辙。
         private static readonly Dictionary<int, int> LevelFSM; 
 
@@ -86,9 +90,9 @@ namespace theArch_LD46
 
         public static float GetVisionCurtainRadius(float val)
         {
-            //val = Mathf.Clamp01(val);
             val = Mathf.Clamp01((val - ENEMY_HITTING_POWER) / (1 - ENEMY_HITTING_POWER));
-            return Mathf.Lerp(1.0f, 7.5f, val);
+            return Mathf.Sqrt(Mathf.Lerp(1.0f, 5.0f * 5.0f, val));
+            //return Mathf.Lerp(1.0f, 5.0f, val);
         }
 
         public static float GetVisionCurtainAlpha(float visionVal)
@@ -106,17 +110,32 @@ namespace theArch_LD46
             };
         }
 
-        public static float GetSenseInitialVal(SenseType senseType)
+        public static SuperSenseType GetSuperVersionOfSense(BasicSenseType basicSenseType)
         {
-            switch (senseType)
+            switch (basicSenseType)
             {
-                case SenseType.Vision:
-                    return 0.5f;
-                case SenseType.Audio:
+                case BasicSenseType.Audio:
+                    return SuperSenseType.SuperAudio;
+                case BasicSenseType.Feeling:
+                    return SuperSenseType.SuperFeeling;
+                case BasicSenseType.Compass:
+                    return SuperSenseType.SuperCompass;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(basicSenseType), basicSenseType, null);
+            }
+        }
+
+        public static float GetSenseInitialVal(BasicSenseType basicSenseType)
+        {
+            switch (basicSenseType)
+            {
+                case BasicSenseType.Vision:
+                    return 1.0f;
+                case BasicSenseType.Audio:
                     return 0.0f;
-                case SenseType.Feeling:
+                case BasicSenseType.Feeling:
                     return 0.0f;
-                case SenseType.Compass:
+                case BasicSenseType.Compass:
                     return 0.0f;
                 default:
                     return 0.0f;
